@@ -7,8 +7,8 @@
 #include <cstring>
 #include "devices/cfn_svc_gnss.h"
 #include "devices/cfn_svc_display.h"
-#include "software/cfn_svc_cli.h"
-#include "software/cfn_svc_at_parser.h"
+#include "utilities/cfn_svc_cli.h"
+#include "utilities/cfn_svc_at_parser.h"
 
 // --- GNSS Tests ---
 

@@ -11,6 +11,8 @@
 #include "devices/cfn_svc_hum_sensor.h"
 #include "devices/cfn_svc_accel.h"
 #include "devices/cfn_svc_gsm.h"
+#include "devices/cfn_svc_network.h"
+#include "devices/cfn_svc_ble.h"
 
 // --- LED Tests ---
 
@@ -116,4 +118,57 @@ TEST_F(GsmTest, SendSmsSuccess)
 {
     api.send_sms = [](cfn_svc_gsm_t *d, const char *n, const char *t) -> cfn_hal_error_code_t { return CFN_HAL_ERROR_OK; };
     EXPECT_EQ(cfn_svc_gsm_send_sms(&driver, "1234", "hello"), CFN_HAL_ERROR_OK);
+}
+
+// --- Network Tests ---
+
+class NetworkTest : public ::testing::Test
+{
+  protected:
+    cfn_svc_network_t     driver{};
+    cfn_svc_network_api_t api{};
+
+    void SetUp() override
+    {
+        memset(&driver, 0, sizeof(driver));
+        memset(&api, 0, sizeof(api));
+        driver.base.type = CFN_SVC_TYPE_NETWORK;
+        driver.api = &api;
+    }
+};
+
+TEST_F(NetworkTest, SendSuccess)
+{
+    api.send = [](cfn_svc_network_t *d, const uint8_t *data, size_t len, size_t *sent) -> cfn_hal_error_code_t
+    {
+        *sent = len;
+        return CFN_HAL_ERROR_OK;
+    };
+    uint8_t data[10];
+    size_t  sent = 0;
+    EXPECT_EQ(cfn_svc_network_send(&driver, data, 10, &sent), CFN_HAL_ERROR_OK);
+    EXPECT_EQ(sent, 10);
+}
+
+// --- BLE Tests ---
+
+class BleTest : public ::testing::Test
+{
+  protected:
+    cfn_svc_ble_t     driver{};
+    cfn_svc_ble_api_t api{};
+
+    void SetUp() override
+    {
+        memset(&driver, 0, sizeof(driver));
+        memset(&api, 0, sizeof(api));
+        driver.base.type = CFN_SVC_TYPE_BLE;
+        driver.api = &api;
+    }
+};
+
+TEST_F(BleTest, AdvStartSuccess)
+{
+    api.adv_start = [](cfn_svc_ble_t *d) -> cfn_hal_error_code_t { return CFN_HAL_ERROR_OK; };
+    EXPECT_EQ(cfn_svc_ble_adv_start(&driver), CFN_HAL_ERROR_OK);
 }

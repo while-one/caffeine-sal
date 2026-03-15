@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 #include <cstring>
-#include "utils/cfn_svc_collection.h"
+#include "utilities/cfn_svc_collection.h"
 
 class CollectionTest : public ::testing::Test
 {

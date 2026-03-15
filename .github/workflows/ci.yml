@@ -21,7 +21,7 @@ jobs:
       run: cmake -B build -S . -DFORMAT_DRY_RUN=ON -DFETCHCONTENT_FULLY_DISCONNECTED=OFF
 
     - name: Check Formatting
-      run: cmake --build build --target caffeine-template-format
+      run: cmake --build build --target caffeine-services-format
 
   static-analysis:
     name: Static Analysis (Cppcheck & Clang-Tidy)
@@ -37,7 +37,7 @@ jobs:
       run: cmake -B build -S .
 
     - name: Run Analysis
-      run: cmake --build build --target caffeine-template-analyze
+      run: cmake --build build --target caffeine-services-analyze
 
   build-and-test:
     name: Build & Unit Tests
@@ -54,7 +54,7 @@ jobs:
       run: cmake -B build -S .
 
     - name: Build Tests
-      run: cmake --build build --target caffeine-template-test -j 4
+      run: cmake --build build --target caffeine-services-test -j 4
 
     - name: Run Unit Tests
       run: ctest --test-dir build --output-on-failure

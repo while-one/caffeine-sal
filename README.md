@@ -4,7 +4,7 @@
   </a>
 </p>
 
-
+# Caffeine-Services
 
 <p align="center">
   <img src="https://img.shields.io/badge/C-11-blue.svg?style=flat-square&logo=c" alt="C11">
@@ -15,50 +15,85 @@
   <a href="https://github.com/while-one/caffeine-services/actions/workflows/ci.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/while-one/caffeine-services/ci.yml?style=flat-square&branch=main" alt="CI Status">
   </a>
-  <a href="https://github.com/while-one/caffeine-services/commits/main">
-    <img src="https://img.shields.io/github/last-commit/while-one/caffeine-services.svg?style=flat-square" alt="Last Commit">
-  </a>
   <a href="https://github.com/while-one/caffeine-services/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/while-one/caffeine-services?style=flat-square&color=blue" alt="License: MIT">
   </a>
 </p>
 
-# Caffeine-Template
+**Caffeine-Services** is the polymorphic middleware layer of the **Caffeine Framework**. It provides a strictly C11-compliant, header-only, Virtual Method Table (VMT) architecture to define abstract interfaces for high-level hardware devices and software services.
 
-This is the foundational template repository for all new components within the **Caffeine Framework** ecosystem (e.g., new hardware ports, middleware libraries, and application layers).
-
-## Shared Ecosystem Standards
-
-By instantiating a repository from this template, you inherit the framework's strict coding standards and CI infrastructure:
-
-*   **Formatting (`config/.clang-format`):** Enforces a 120-column limit, 4-space indentation, and Allman-style braces.
-*   **Static Analysis (`config/.clang-tidy`):** Enforces strict C11 compliance, memory safety rules (no dynamic allocation), and best practices for embedded systems.
-*   **GitHub Infrastructure (`.github/`):** Pre-configured Pull Request templates, repository ownership rules, and baseline Continuous Integration workflows using optimized Docker containers.
-
-## The Caffeine Framework Layers
-
-The framework is composed of the following distinct layers:
-
-1.  **Generic Interface ([`caffeine-hal`](https://github.com/while-one/caffeine-hal)):** Header-only definitions of the Hardware Abstraction Layer and Virtual Method Tables (VMTs).
-2.  **Hardware Ports ([`caffeine-hal-ports`](https://github.com/while-one/caffeine-hal-ports)):** The concrete implementations of the HAL for specific vendors (e.g., STM32, NXP, nRF, TI) and OS environments (Linux POSIX). It encapsulates vendor SDKs and provides modern CMake cross-compilation presets.
-3.  **Middleware (TBD):** Device drivers (e.g., displays, sensors) and protocols (e.g., Modbus, USB stacks) that build strictly upon the generic `caffeine-hal` interface, remaining completely agnostic to the underlying hardware.
-4.  **Application (TBD):** The top-level business logic, state machines, and system orchestration that utilize the middleware and HAL interfaces.
-
-## Next Steps for New Components
-
-1.  Update this `README.md` to describe the specific purpose of the new repository (e.g., "STM32 Porting Layer", "Modbus Middleware").
-2.  Review and customize `.github/workflows/ci.yml` if your component requires a specific cross-compilation matrix (like ARM GCC) rather than native testing.
-3.  Add the specific source files and CMake configuration (e.g., `CMakePresets.json`) as outlined in the [Caffeine-HAL Architecture Guide](https://github.com/while-one/caffeine-hal).
+Built directly on top of [**Caffeine-HAL**](https://github.com/while-one/caffeine-hal), this library ensures that business logic remains completely portable across different hardware implementations.
 
 ---
 
-## Support
+## Overview
 
-They say dealing with abstraction is a form of art, so I suppose that makes me an artist? Whether this caffeine fuels an elegant HAL or a deep debugging session, I appreciate you being part of the gallery.
+The library decouples the high-level API from the concrete implementation (e.g., a specific sensor model or a specific CLI parser). This allows you to write application code that interacts with a "Temperature Sensor" or an "AT Parser" without caring about the specific hardware or software implementation underneath.
 
-If my projects helped you, buy me a brew or if the opposite open a PR!
+### Key Features
+*   **Header-Only Interface:** Zero-overhead abstractions using `static inline` wrappers.
+*   **Homogeneous Architecture:** Inherits from the standard `cfn_hal_driver_t` container, ensuring a consistent lifecycle (`init`, `deinit`, `config`, `callback`) across the entire framework.
+*   **Layered Identification:** Uses FourCC codes with the `S` prefix (e.g., `SLED`, `STMP`) to uniquely identify services.
+*   **Unified Collections:** A single polymorphic interface for Ring Buffers, Linked Lists, and Queues.
+*   **Thread-Safe:** Directly utilizes the `CFN_HAL_WITH_LOCK` mechanism for multi-threaded safety.
 
-<a href="https://www.buymeacoffee.com/whileone" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+---
+
+## Directory Structure
+
+*   `include/cfn_svc.h`: Core macros and FourCC definitions.
+*   `include/devices/`: Hardware-agnostic interfaces for physical components.
+    *   `cfn_svc_led.h`, `cfn_svc_button.h`, `cfn_svc_accel.h`, `cfn_svc_gsm.h`, etc.
+*   `include/utilities/`: High-level software services and data structures.
+    *   `cfn_svc_cli.h`, `cfn_svc_at_parser.h`, `cfn_svc_collection.h`.
+
+---
+
+## Integration
+
+### 1. CMake (FetchContent)
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+    caffeine-services
+    GIT_REPOSITORY https://github.com/while-one/caffeine-services.git
+    GIT_TAG        main
+)
+FetchContent_MakeAvailable(caffeine-services)
+
+target_link_libraries(your_app PRIVATE caffeine::services)
+```
+
+### 2. Usage Example (LED)
+
+```c
+#include "devices/cfn_svc_led.h"
+
+// Define configuration
+cfn_svc_led_config_t led_cfg = { .active_low = false };
+
+// Physical mapping (provided by implementation layer)
+extern cfn_svc_led_api_t my_specific_led_impl;
+cfn_svc_led_phy_t led_phy = { .instance = (void*)&GPIO_INSTANCE_PORT_A };
+
+// Initialize
+cfn_svc_led_t status_led = CFN_SVC_LED_INITIALIZER(&my_specific_led_impl, &led_phy, &led_cfg);
+cfn_svc_led_init(&status_led);
+
+// Use
+cfn_svc_led_set_state(&status_led, CFN_SVC_LED_STATE_ON);
+```
+
+---
+
+## Development & Contribution
+
+All contributions must adhere to the [**SKILL.md**](SKILL.md) guidelines:
+*   Strict C11 (No C++ or GNU extensions).
+*   No dynamic memory allocation.
+*   Allman-style braces and 120-column limit.
+*   Polymorphic VMT pattern for all complex interfaces.
 
 ---
 
