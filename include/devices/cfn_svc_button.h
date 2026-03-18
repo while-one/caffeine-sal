@@ -58,7 +58,10 @@ typedef struct cfn_svc_button_api_s cfn_svc_button_api_t;
 /**
  * @brief Button callback signature.
  */
-typedef void (*cfn_svc_button_callback_t)(cfn_svc_button_t *driver, uint32_t event_mask, uint32_t error_mask, void *user_arg);
+typedef void (*cfn_svc_button_callback_t)(cfn_svc_button_t *driver,
+                                          uint32_t          event_mask,
+                                          uint32_t          error_mask,
+                                          void             *user_arg);
 
 /**
  * @brief Button Virtual Method Table (VMT).
@@ -76,24 +79,145 @@ struct cfn_svc_button_api_s
 
 CFN_HAL_VMT_CHECK(struct cfn_svc_button_api_s);
 
-CFN_SVC_CREATE_DRIVER_TYPE(svc_button, cfn_svc_button_config_t, cfn_svc_button_api_t, cfn_svc_button_phy_t, cfn_svc_button_callback_t);
+CFN_SVC_CREATE_DRIVER_TYPE(
+    svc_button, cfn_svc_button_config_t, cfn_svc_button_api_t, cfn_svc_button_phy_t, cfn_svc_button_callback_t);
 
-#define CFN_SVC_BUTTON_INITIALIZER(api_ptr, phy_ptr, config_ptr)                                                      \
+#define CFN_SVC_BUTTON_INITIALIZER(api_ptr, phy_ptr, config_ptr)                                                       \
     CFN_SVC_DRIVER_INITIALIZER(CFN_SVC_TYPE_BUTTON, api_ptr, phy_ptr, config_ptr)
 
 /* Functions inline ------------------------------------------------- */
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_init(cfn_svc_button_t *driver)
 {
-    if (!driver) { return CFN_HAL_ERROR_BAD_PARAM; }
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
     driver->base.vmt = (const struct cfn_hal_api_base_s *) driver->api;
     return cfn_hal_base_init(&driver->base, CFN_SVC_TYPE_BUTTON);
 }
 
-CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_get_state(cfn_svc_button_t *driver, cfn_svc_button_state_t *state_out)
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_deinit(cfn_svc_button_t *driver)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_deinit(&driver->base, CFN_SVC_TYPE_BUTTON);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_config_set(cfn_svc_button_t              *driver,
+                                                              const cfn_svc_button_config_t *config)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    driver->config = config;
+    return cfn_hal_base_config_set(&driver->base, CFN_SVC_TYPE_BUTTON, (const void *) config);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_config_get(cfn_svc_button_t *driver, cfn_svc_button_config_t *config)
+{
+    if (!driver || !config || !driver->config)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    *config = *(driver->config);
+    return CFN_HAL_ERROR_OK;
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_callback_register(cfn_svc_button_t         *driver,
+                                                                     cfn_svc_button_callback_t callback,
+                                                                     void                     *user_arg)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    driver->cb = callback;
+    driver->cb_user_arg = user_arg;
+    return cfn_hal_base_callback_register(&driver->base, CFN_SVC_TYPE_BUTTON, (cfn_hal_callback_t) callback, user_arg);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_power_state_set(cfn_svc_button_t     *driver,
+                                                                   cfn_hal_power_state_t state)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_power_state_set(&driver->base, CFN_SVC_TYPE_BUTTON, state);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_event_enable(cfn_svc_button_t *driver, uint32_t event_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_event_enable(&driver->base, CFN_SVC_TYPE_BUTTON, event_mask);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_event_disable(cfn_svc_button_t *driver, uint32_t event_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_event_disable(&driver->base, CFN_SVC_TYPE_BUTTON, event_mask);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_event_get(cfn_svc_button_t *driver, uint32_t *event_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_event_get(&driver->base, CFN_SVC_TYPE_BUTTON, event_mask);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_error_enable(cfn_svc_button_t *driver, uint32_t error_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_error_enable(&driver->base, CFN_SVC_TYPE_BUTTON, error_mask);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_error_disable(cfn_svc_button_t *driver, uint32_t error_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_error_disable(&driver->base, CFN_SVC_TYPE_BUTTON, error_mask);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_error_get(cfn_svc_button_t *driver, uint32_t *error_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_error_get(&driver->base, CFN_SVC_TYPE_BUTTON, error_mask);
+}
+
+/* Service Specific Functions --------------------------------------- */
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_get_state(cfn_svc_button_t       *driver,
+                                                             cfn_svc_button_state_t *state_out)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_BUTTON, get_state, driver, error, state_out);
+    return error;
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_set_debounce_time(cfn_svc_button_t *driver, uint32_t ms)
+{
+    cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
+    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_BUTTON, set_debounce_time, driver, error, ms);
     return error;
 }
 
@@ -101,6 +225,13 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_is_pressed(cfn_svc_button_t *
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_BUTTON, is_pressed, driver, error, pressed_out);
+    return error;
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_button_is_released(cfn_svc_button_t *driver, bool *released_out)
+{
+    cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
+    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_BUTTON, is_released, driver, error, released_out);
     return error;
 }
 

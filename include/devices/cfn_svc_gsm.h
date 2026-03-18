@@ -89,22 +89,188 @@ CFN_HAL_VMT_CHECK(struct cfn_svc_gsm_api_s);
 
 CFN_SVC_CREATE_DRIVER_TYPE(svc_gsm, cfn_svc_gsm_config_t, cfn_svc_gsm_api_t, cfn_svc_gsm_phy_t, cfn_svc_gsm_callback_t);
 
-#define CFN_SVC_GSM_INITIALIZER(api_ptr, phy_ptr, config_ptr)                                                        \
+#define CFN_SVC_GSM_INITIALIZER(api_ptr, phy_ptr, config_ptr)                                                          \
     CFN_SVC_DRIVER_INITIALIZER(CFN_SVC_TYPE_GSM, api_ptr, phy_ptr, config_ptr)
 
 /* Functions inline ------------------------------------------------- */
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_init(cfn_svc_gsm_t *driver)
 {
-    if (!driver) { return CFN_HAL_ERROR_BAD_PARAM; }
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
     driver->base.vmt = (const struct cfn_hal_api_base_s *) driver->api;
     return cfn_hal_base_init(&driver->base, CFN_SVC_TYPE_GSM);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_deinit(cfn_svc_gsm_t *driver)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_deinit(&driver->base, CFN_SVC_TYPE_GSM);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_config_set(cfn_svc_gsm_t *driver, const cfn_svc_gsm_config_t *config)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    driver->config = config;
+    return cfn_hal_base_config_set(&driver->base, CFN_SVC_TYPE_GSM, (const void *) config);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_config_get(cfn_svc_gsm_t *driver, cfn_svc_gsm_config_t *config)
+{
+    if (!driver || !config || !driver->config)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    *config = *(driver->config);
+    return CFN_HAL_ERROR_OK;
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_callback_register(cfn_svc_gsm_t         *driver,
+                                                                  cfn_svc_gsm_callback_t callback,
+                                                                  void                  *user_arg)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    driver->cb = callback;
+    driver->cb_user_arg = user_arg;
+    return cfn_hal_base_callback_register(&driver->base, CFN_SVC_TYPE_GSM, (cfn_hal_callback_t) callback, user_arg);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_power_state_set(cfn_svc_gsm_t *driver, cfn_hal_power_state_t state)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_power_state_set(&driver->base, CFN_SVC_TYPE_GSM, state);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_event_enable(cfn_svc_gsm_t *driver, uint32_t event_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_event_enable(&driver->base, CFN_SVC_TYPE_GSM, event_mask);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_event_disable(cfn_svc_gsm_t *driver, uint32_t event_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_event_disable(&driver->base, CFN_SVC_TYPE_GSM, event_mask);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_event_get(cfn_svc_gsm_t *driver, uint32_t *event_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_event_get(&driver->base, CFN_SVC_TYPE_GSM, event_mask);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_error_enable(cfn_svc_gsm_t *driver, uint32_t error_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_error_enable(&driver->base, CFN_SVC_TYPE_GSM, error_mask);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_error_disable(cfn_svc_gsm_t *driver, uint32_t error_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_error_disable(&driver->base, CFN_SVC_TYPE_GSM, error_mask);
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_error_get(cfn_svc_gsm_t *driver, uint32_t *error_mask)
+{
+    if (!driver)
+    {
+        return CFN_HAL_ERROR_BAD_PARAM;
+    }
+    return cfn_hal_base_error_get(&driver->base, CFN_SVC_TYPE_GSM, error_mask);
+}
+
+/* Service Specific Functions --------------------------------------- */
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_power_on(cfn_svc_gsm_t *driver)
+{
+    cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
+    CFN_HAL_CHECK_AND_CALL_FUNC(CFN_SVC_TYPE_GSM, power_on, driver, error);
+    return error;
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_power_off(cfn_svc_gsm_t *driver)
+{
+    cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
+    CFN_HAL_CHECK_AND_CALL_FUNC(CFN_SVC_TYPE_GSM, power_off, driver, error);
+    return error;
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_reset(cfn_svc_gsm_t *driver)
+{
+    cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
+    CFN_HAL_CHECK_AND_CALL_FUNC(CFN_SVC_TYPE_GSM, reset, driver, error);
+    return error;
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_get_signal_quality(cfn_svc_gsm_t *driver, int32_t *rssi_dbm)
+{
+    cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
+    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_GSM, get_signal_quality, driver, error, rssi_dbm);
+    return error;
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_get_network_status(cfn_svc_gsm_t            *driver,
+                                                                   cfn_svc_gsm_net_status_t *status)
+{
+    cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
+    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_GSM, get_network_status, driver, error, status);
+    return error;
 }
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_send_sms(cfn_svc_gsm_t *driver, const char *number, const char *text)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_GSM, send_sms, driver, error, number, text);
+    return error;
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_http_get(cfn_svc_gsm_t *driver,
+                                                         const char    *url,
+                                                         uint8_t       *response,
+                                                         size_t        *len)
+{
+    cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
+    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_GSM, http_get, driver, error, url, response, len);
+    return error;
+}
+
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_mqtt_publish(cfn_svc_gsm_t *driver,
+                                                             const char    *topic,
+                                                             const uint8_t *payload,
+                                                             size_t         len)
+{
+    cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
+    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_GSM, mqtt_publish, driver, error, topic, payload, len);
     return error;
 }
 

@@ -53,9 +53,9 @@ if(PROJECT_IS_TOP_LEVEL)
 else()
     set(DEFAULT_BUILD_TESTS OFF)
 endif()
-option(CAFFEINE_SERVICES_BUILD_TESTS "Build the Caffeine-Services test executable" ${DEFAULT_BUILD_TESTS})
+option(CFN_SERVICES_BUILD_TESTS "Build the Caffeine-Services test executable" ${DEFAULT_BUILD_TESTS})
 
-if(CAFFEINE_SERVICES_BUILD_TESTS)
+if(CFN_SERVICES_BUILD_TESTS)
     include(CTest)
     if(BUILD_TESTING)
         add_subdirectory(tests)
@@ -141,13 +141,14 @@ if(CPPCHECK)
         --enable=all
         --suppress=missingIncludeSystem
         --suppress=unusedFunction
+        --suppress=*:*/_deps/*
         --inline-suppr
         --std=c11
         -I ${PROJECT_SOURCE_DIR}/include
+        -I ${caffeine-hal_SOURCE_DIR}/include
         ${ALL_HEADERS}
         COMMENT "Running cppcheck static analysis..."
     )
-    
     if(NOT TARGET ${PROJECT_NAME}-analyze)
         add_custom_target(${PROJECT_NAME}-analyze COMMENT "Running full static analysis suite...")
     endif()
@@ -160,16 +161,31 @@ if(CLANG_TIDY)
     add_custom_target(
         ${PROJECT_NAME}-tidy
         COMMAND ${CLANG_TIDY}
+        -p=${CMAKE_BINARY_DIR}
         --config-file=${PROJECT_SOURCE_DIR}/config/coding/.clang-tidy
-        --header-filter=.*
-        ${ALL_HEADERS}
-        --
-        -I${PROJECT_SOURCE_DIR}/include
-        -std=c11
-        COMMENT "Running clang-tidy static analysis..."
+        --header-filter="${PROJECT_SOURCE_DIR}/include/.*"
+        ${TEST_SOURCES}
+        ${PROJECT_SOURCE_DIR}/tests/compliance.c
+        COMMENT "Running clang-tidy static analysis using compile_commands.json..."
     )
     
     if(TARGET ${PROJECT_NAME}-analyze)
         add_dependencies(${PROJECT_NAME}-analyze ${PROJECT_NAME}-tidy)
     endif()
+endif()
+
+# 4. C11 Compliance Check
+add_executable(${PROJECT_NAME}-compliance ${PROJECT_SOURCE_DIR}/tests/compliance.c)
+target_link_libraries(${PROJECT_NAME}-compliance PRIVATE ${PROJECT_NAME})
+target_compile_options(${PROJECT_NAME}-compliance PRIVATE
+    -std=c11
+    -pedantic-errors
+    -Wall
+    -Wextra
+    -Werror
+)
+set_target_properties(${PROJECT_NAME}-compliance PROPERTIES EXCLUDE_FROM_ALL ON)
+
+if(TARGET ${PROJECT_NAME}-analyze)
+    add_dependencies(${PROJECT_NAME}-analyze ${PROJECT_NAME}-compliance)
 endif()

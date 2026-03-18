@@ -28,14 +28,14 @@ Built directly on top of [**Caffeine-HAL**](https://github.com/while-one/caffein
 
 ## Overview
 
-The library decouples the high-level API from the concrete implementation (e.g., a specific sensor model or a specific CLI parser). This allows you to write application code that interacts with a "Temperature Sensor" or an "AT Parser" without caring about the specific hardware or software implementation underneath.
+The library decouples high-level application logic from concrete implementations. By providing generic interfaces like `Transport` or `Connection`, application code can interact with any communication link (UART, BLE, LoRaWAN, TCP) through a unified API.
 
 ### Key Features
 *   **Header-Only Interface:** Zero-overhead abstractions using `static inline` wrappers.
 *   **Homogeneous Architecture:** Inherits from the standard `cfn_hal_driver_t` container, ensuring a consistent lifecycle (`init`, `deinit`, `config`, `callback`) across the entire framework.
-*   **Layered Identification:** Uses FourCC codes with the `S` prefix (e.g., `SLED`, `STMP`) to uniquely identify services.
-*   **Unified Collections:** A single polymorphic interface for Ring Buffers, Linked Lists, and Queues.
-*   **Thread-Safe:** Directly utilizes the `CFN_HAL_WITH_LOCK` mechanism for multi-threaded safety.
+*   **Generic Networking:** Unified `Connection` and `Transport` (Sync/Async) abstractions for link-layer and data-stream management.
+*   **Thread-Safe:** Designed for seamless integration with the `CFN_HAL_WITH_LOCK` mechanism.
+*   **Safety First:** Exhaustive parameter validation and FourCC type checking at runtime.
 
 ---
 
@@ -43,9 +43,11 @@ The library decouples the high-level API from the concrete implementation (e.g.,
 
 *   `include/cfn_svc.h`: Core macros and FourCC definitions.
 *   `include/devices/`: Hardware-agnostic interfaces for physical components.
-    *   `cfn_svc_led.h`, `cfn_svc_button.h`, `cfn_svc_accel.h`, `cfn_svc_gsm.h`, etc.
+    *   `led.h`, `button.h`, `accel.h`, `temp_sensor.h`, `hum_sensor.h`, `battery.h`, `light_sensor.h`, `pressure_sensor.h`, `gnss.h`, `display.h`.
+*   `include/network/`: Generic connectivity and protocol abstractions.
+    *   `connection.h` (Link-layer management), `transport.h` (Streaming/Datagram Data).
 *   `include/utilities/`: High-level software services and data structures.
-    *   `cfn_svc_cli.h`, `cfn_svc_at_parser.h`, `cfn_svc_collection.h`.
+    *   `cli.h`, `at_parser.h`, `collection.h`, `fs.h` (File System), `logging.h`.
 
 ---
 
@@ -63,26 +65,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(caffeine-services)
 
 target_link_libraries(your_app PRIVATE caffeine::services)
-```
-
-### 2. Usage Example (LED)
-
-```c
-#include "devices/cfn_svc_led.h"
-
-// Define configuration
-cfn_svc_led_config_t led_cfg = { .active_low = false };
-
-// Physical mapping (provided by implementation layer)
-extern cfn_svc_led_api_t my_specific_led_impl;
-cfn_svc_led_phy_t led_phy = { .instance = (void*)&GPIO_INSTANCE_PORT_A };
-
-// Initialize
-cfn_svc_led_t status_led = CFN_SVC_LED_INITIALIZER(&my_specific_led_impl, &led_phy, &led_cfg);
-cfn_svc_led_init(&status_led);
-
-// Use
-cfn_svc_led_set_state(&status_led, CFN_SVC_LED_STATE_ON);
 ```
 
 ---

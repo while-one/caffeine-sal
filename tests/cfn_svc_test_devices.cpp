@@ -11,8 +11,17 @@
 #include "devices/cfn_svc_hum_sensor.h"
 #include "devices/cfn_svc_accel.h"
 #include "devices/cfn_svc_gsm.h"
-#include "devices/cfn_svc_network.h"
-#include "devices/cfn_svc_ble.h"
+#include "devices/cfn_svc_battery.h"
+#include "devices/cfn_svc_light_sensor.h"
+#include "devices/cfn_svc_pressure_sensor.h"
+#include "devices/cfn_svc_gnss.h"
+#include "devices/cfn_svc_display.h"
+#include "network/cfn_svc_connection.h"
+#include "network/cfn_svc_transport.h"
+#include "utilities/cfn_svc_cli.h"
+#include "utilities/cfn_svc_at_parser.h"
+#include "utilities/cfn_svc_fs.h"
+#include "utilities/cfn_svc_logging.h"
 
 // --- LED Tests ---
 
@@ -42,9 +51,73 @@ TEST_F(LedTest, LifecycleSuccess)
 TEST_F(LedTest, ToggleSuccess)
 {
     static bool toggled = false;
-    api.toggle = [](cfn_svc_led_t *d) -> cfn_hal_error_code_t { toggled = true; return CFN_HAL_ERROR_OK; };
+    api.toggle = [](cfn_svc_led_t *d) -> cfn_hal_error_code_t
+    {
+        toggled = true;
+        return CFN_HAL_ERROR_OK;
+    };
     EXPECT_EQ(cfn_svc_led_toggle(&driver), CFN_HAL_ERROR_OK);
     EXPECT_TRUE(toggled);
+}
+
+// --- Connection Tests ---
+
+class ConnectionTest : public ::testing::Test
+{
+  protected:
+    cfn_svc_connection_t     driver{};
+    cfn_svc_connection_api_t api{};
+
+    void SetUp() override
+    {
+        memset(&driver, 0, sizeof(driver));
+        memset(&api, 0, sizeof(api));
+        driver.base.type = CFN_SVC_TYPE_CONNECTION;
+        driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
+        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
+        driver.api = &api;
+    }
+};
+
+TEST_F(ConnectionTest, ConnectSuccess)
+{
+    api.connect = [](cfn_svc_connection_t *d) -> cfn_hal_error_code_t { return CFN_HAL_ERROR_OK; };
+    EXPECT_EQ(cfn_svc_connection_connect(&driver), CFN_HAL_ERROR_OK);
+}
+
+// --- Transport Tests ---
+
+class TransportTest : public ::testing::Test
+{
+  protected:
+    cfn_svc_transport_t     driver{};
+    cfn_svc_transport_api_t api{};
+
+    void SetUp() override
+    {
+        memset(&driver, 0, sizeof(driver));
+        memset(&api, 0, sizeof(api));
+        driver.base.type = CFN_SVC_TYPE_TRANSPORT;
+        driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
+        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
+        driver.api = &api;
+    }
+};
+
+TEST_F(TransportTest, SendSyncSuccess)
+{
+    api.send = [](cfn_svc_transport_t *d, const uint8_t *data, size_t len, uint32_t timeout) -> cfn_hal_error_code_t
+    { return CFN_HAL_ERROR_OK; };
+    uint8_t data[10];
+    EXPECT_EQ(cfn_svc_transport_send(&driver, data, 10, 100), CFN_HAL_ERROR_OK);
+}
+
+TEST_F(TransportTest, SendAsyncSuccess)
+{
+    api.send_async = [](cfn_svc_transport_t *d, const uint8_t *data, size_t len) -> cfn_hal_error_code_t
+    { return CFN_HAL_ERROR_OK; };
+    uint8_t data[10];
+    EXPECT_EQ(cfn_svc_transport_send_async(&driver, data, 10), CFN_HAL_ERROR_OK);
 }
 
 // --- Button Tests ---
@@ -60,115 +133,132 @@ class ButtonTest : public ::testing::Test
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
         driver.base.type = CFN_SVC_TYPE_BUTTON;
+        driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
+        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
         driver.api = &api;
     }
 };
 
 TEST_F(ButtonTest, IsPressedSuccess)
 {
-    api.is_pressed = [](cfn_svc_button_t *d, bool *p) -> cfn_hal_error_code_t { *p = true; return CFN_HAL_ERROR_OK; };
+    api.is_pressed = [](cfn_svc_button_t *d, bool *p) -> cfn_hal_error_code_t
+    {
+        *p = true;
+        return CFN_HAL_ERROR_OK;
+    };
     bool pressed = false;
     EXPECT_EQ(cfn_svc_button_is_pressed(&driver, &pressed), CFN_HAL_ERROR_OK);
     EXPECT_TRUE(pressed);
 }
 
-// --- Sensor Tests ---
+// --- Battery Tests ---
 
-class TempSensorTest : public ::testing::Test
+class BatteryTest : public ::testing::Test
 {
   protected:
-    cfn_svc_temp_sensor_t     driver{};
-    cfn_svc_temp_sensor_api_t api{};
+    cfn_svc_battery_t     driver{};
+    cfn_svc_battery_api_t api{};
 
     void SetUp() override
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SVC_TYPE_TEMP_SENSOR;
+        driver.base.type = CFN_SVC_TYPE_BATTERY;
+        driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
+        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
         driver.api = &api;
     }
 };
 
-TEST_F(TempSensorTest, ReadCelsiusSuccess)
+TEST_F(BatteryTest, GetVoltageSuccess)
 {
-    api.read_celsius = [](cfn_svc_temp_sensor_t *d, float *t) -> cfn_hal_error_code_t { *t = 25.5f; return CFN_HAL_ERROR_OK; };
-    float temp = 0;
-    EXPECT_EQ(cfn_svc_temp_sensor_read_celsius(&driver, &temp), CFN_HAL_ERROR_OK);
-    EXPECT_NEAR(temp, 25.5f, 0.01f);
-}
-
-// --- GSM Tests ---
-
-class GsmTest : public ::testing::Test
-{
-  protected:
-    cfn_svc_gsm_t     driver{};
-    cfn_svc_gsm_api_t api{};
-
-    void SetUp() override
+    api.get_voltage = [](cfn_svc_battery_t *d, float *v) -> cfn_hal_error_code_t
     {
-        memset(&driver, 0, sizeof(driver));
-        memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SVC_TYPE_GSM;
-        driver.api = &api;
-    }
-};
-
-TEST_F(GsmTest, SendSmsSuccess)
-{
-    api.send_sms = [](cfn_svc_gsm_t *d, const char *n, const char *t) -> cfn_hal_error_code_t { return CFN_HAL_ERROR_OK; };
-    EXPECT_EQ(cfn_svc_gsm_send_sms(&driver, "1234", "hello"), CFN_HAL_ERROR_OK);
-}
-
-// --- Network Tests ---
-
-class NetworkTest : public ::testing::Test
-{
-  protected:
-    cfn_svc_network_t     driver{};
-    cfn_svc_network_api_t api{};
-
-    void SetUp() override
-    {
-        memset(&driver, 0, sizeof(driver));
-        memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SVC_TYPE_NETWORK;
-        driver.api = &api;
-    }
-};
-
-TEST_F(NetworkTest, SendSuccess)
-{
-    api.send = [](cfn_svc_network_t *d, const uint8_t *data, size_t len, size_t *sent) -> cfn_hal_error_code_t
-    {
-        *sent = len;
+        *v = 3.7f;
         return CFN_HAL_ERROR_OK;
     };
-    uint8_t data[10];
-    size_t  sent = 0;
-    EXPECT_EQ(cfn_svc_network_send(&driver, data, 10, &sent), CFN_HAL_ERROR_OK);
-    EXPECT_EQ(sent, 10);
+    float volts = 0;
+    EXPECT_EQ(cfn_svc_battery_get_voltage(&driver, &volts), CFN_HAL_ERROR_OK);
+    EXPECT_NEAR(volts, 3.7f, 0.01f);
 }
 
-// --- BLE Tests ---
+// --- GNSS Tests ---
 
-class BleTest : public ::testing::Test
+class GnssTest : public ::testing::Test
 {
   protected:
-    cfn_svc_ble_t     driver{};
-    cfn_svc_ble_api_t api{};
+    cfn_svc_gnss_t     driver{};
+    cfn_svc_gnss_api_t api{};
 
     void SetUp() override
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SVC_TYPE_BLE;
+        driver.base.type = CFN_SVC_TYPE_GNSS;
+        driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
+        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
         driver.api = &api;
     }
 };
 
-TEST_F(BleTest, AdvStartSuccess)
+TEST_F(GnssTest, GetLocationSuccess)
 {
-    api.adv_start = [](cfn_svc_ble_t *d) -> cfn_hal_error_code_t { return CFN_HAL_ERROR_OK; };
-    EXPECT_EQ(cfn_svc_ble_adv_start(&driver), CFN_HAL_ERROR_OK);
+    api.get_location = [](cfn_svc_gnss_t *d, cfn_svc_gnss_location_t *loc) -> cfn_hal_error_code_t
+    {
+        loc->latitude = 45.0;
+        return CFN_HAL_ERROR_OK;
+    };
+    cfn_svc_gnss_location_t loc = {};
+    EXPECT_EQ(cfn_svc_gnss_get_location(&driver, &loc), CFN_HAL_ERROR_OK);
+    EXPECT_DOUBLE_EQ(loc.latitude, 45.0);
+}
+
+// --- FS Tests ---
+
+class FsTest : public ::testing::Test
+{
+  protected:
+    cfn_svc_fs_t     driver{};
+    cfn_svc_fs_api_t api{};
+
+    void SetUp() override
+    {
+        memset(&driver, 0, sizeof(driver));
+        memset(&api, 0, sizeof(api));
+        driver.base.type = CFN_SVC_TYPE_FS;
+        driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
+        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
+        driver.api = &api;
+    }
+};
+
+TEST_F(FsTest, MountSuccess)
+{
+    api.mount = [](cfn_svc_fs_t *d) -> cfn_hal_error_code_t { return CFN_HAL_ERROR_OK; };
+    EXPECT_EQ(cfn_svc_fs_mount(&driver), CFN_HAL_ERROR_OK);
+}
+
+// --- Logging Tests ---
+
+class LoggingTest : public ::testing::Test
+{
+  protected:
+    cfn_svc_logging_t     driver{};
+    cfn_svc_logging_api_t api{};
+
+    void SetUp() override
+    {
+        memset(&driver, 0, sizeof(driver));
+        memset(&api, 0, sizeof(api));
+        driver.base.type = CFN_SVC_TYPE_LOGGING;
+        driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
+        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
+        driver.api = &api;
+    }
+};
+
+TEST_F(LoggingTest, FlushSuccess)
+{
+    api.flush = [](cfn_svc_logging_t *d) -> cfn_hal_error_code_t { return CFN_HAL_ERROR_OK; };
+    EXPECT_EQ(cfn_svc_log_flush(&driver), CFN_HAL_ERROR_OK);
 }

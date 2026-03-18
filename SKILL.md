@@ -63,7 +63,8 @@ All new service interfaces MUST have a corresponding unit test in `tests/`.
 ## 6. Directory Structure Mandates
 
 *   `include/devices/`: Interfaces for physical components (LEDs, Sensors, Displays).
-*   `include/utilities/`: Software-only services and data structures (CLI, Collections, AT Parsers).
+*   `include/network/`: Generic connectivity and protocol abstractions (Connection, Transport).
+*   `include/utilities/`: Software-only services and data structures (CLI, Collections, AT Parsers, File System).
 *   `include/cfn_svc.h`: Core macro definitions.
 *   `include/cfn_svc_types.h`: Shared service-layer types.
 

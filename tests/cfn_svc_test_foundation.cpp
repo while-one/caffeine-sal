@@ -25,7 +25,8 @@ typedef struct
 
 typedef void (*dummy_svc_callback_t)(void *driver, uint32_t event, uint32_t error, void *arg);
 
-CFN_HAL_CREATE_DRIVER_TYPE(dummy_svc, dummy_svc_config_t, struct dummy_svc_api_s, dummy_svc_phy_t, dummy_svc_callback_t);
+CFN_HAL_CREATE_DRIVER_TYPE(
+    dummy_svc, dummy_svc_config_t, struct dummy_svc_api_s, dummy_svc_phy_t, dummy_svc_callback_t);
 
 TEST(FoundationTest, FourCCGeneration)
 {
@@ -40,8 +41,8 @@ TEST(FoundationTest, FourCCGeneration)
 TEST(FoundationTest, DriverInitializer)
 {
     struct dummy_svc_api_s api = {};
-    dummy_svc_phy_t phy = {};
-    dummy_svc_config_t config = {};
+    dummy_svc_phy_t        phy = {};
+    dummy_svc_config_t     config = {};
 
     cfn_hal_dummy_svc_t driver = CFN_SVC_DRIVER_INITIALIZER(CFN_SVC_TYPE('D', 'U', 'M'), &api, &phy, &config);
 

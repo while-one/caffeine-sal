@@ -68,16 +68,16 @@ TEST_F(CollectionTest, InitSuccess)
 TEST_F(CollectionTest, PushPopSizeSuccess)
 {
     static int mock_val = 0;
-    
+
     api.push_back = [](cfn_svc_collection_t *d, const void *item) -> cfn_hal_error_code_t
     {
-        mock_val = *(const int *)item;
+        mock_val = *(const int *) item;
         return CFN_HAL_ERROR_OK;
     };
-    
+
     api.pop_front = [](cfn_svc_collection_t *d, void *item_out) -> cfn_hal_error_code_t
     {
-        *(int *)item_out = mock_val;
+        *(int *) item_out = mock_val;
         return CFN_HAL_ERROR_OK;
     };
 
@@ -87,8 +87,8 @@ TEST_F(CollectionTest, PushPopSizeSuccess)
         return CFN_HAL_ERROR_OK;
     };
 
-    int input = 42;
-    int output = 0;
+    int    input = 42;
+    int    output = 0;
     size_t size = 0;
 
     EXPECT_EQ(cfn_svc_collection_push_back(&driver, &input), CFN_HAL_ERROR_OK);
