@@ -48,14 +48,9 @@ target_sources(
 )
 
 # --- Testing ---
-if(PROJECT_IS_TOP_LEVEL)
-    set(DEFAULT_BUILD_TESTS ON)
-else()
-    set(DEFAULT_BUILD_TESTS OFF)
-endif()
-option(CFN_SERVICES_BUILD_TESTS "Build the Caffeine-Services test executable" ${DEFAULT_BUILD_TESTS})
+option(CFN_SERVICES_BUILD_TESTS "Build the Caffeine-Services test executable" OFF)
 
-if(CFN_SERVICES_BUILD_TESTS)
+if(PROJECT_IS_TOP_LEVEL AND CFN_SERVICES_BUILD_TESTS)
     include(CTest)
     if(BUILD_TESTING)
         add_subdirectory(tests)
