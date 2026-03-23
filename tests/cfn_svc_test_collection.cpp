@@ -49,7 +49,11 @@ TEST_F(CollectionTest, UnimplementedApiReturnsNotSupported)
 TEST_F(CollectionTest, OnConfigFailureAbortsInit)
 {
     driver.base.on_config = [](cfn_hal_driver_t *b, void *arg, cfn_hal_config_phase_t phase) -> cfn_hal_error_code_t
-    { return (phase == CFN_HAL_CONFIG_PHASE_INIT) ? CFN_HAL_ERROR_FAIL : CFN_HAL_ERROR_OK; };
+    {
+        (void) b;
+        (void) arg;
+        return (phase == CFN_HAL_CONFIG_PHASE_INIT) ? CFN_HAL_ERROR_FAIL : CFN_HAL_ERROR_OK;
+    };
     EXPECT_EQ(cfn_svc_collection_init(&driver), CFN_HAL_ERROR_FAIL);
     EXPECT_EQ(driver.base.status, CFN_HAL_DRIVER_STATUS_CONSTRUCTED);
 }
@@ -58,7 +62,11 @@ TEST_F(CollectionTest, OnConfigFailureAbortsInit)
 
 TEST_F(CollectionTest, InitSuccess)
 {
-    api.base.init = [](cfn_hal_driver_t *d) -> cfn_hal_error_code_t { return CFN_HAL_ERROR_OK; };
+    api.base.init = [](cfn_hal_driver_t *d) -> cfn_hal_error_code_t
+    {
+        (void) d;
+        return CFN_HAL_ERROR_OK;
+    };
     EXPECT_EQ(cfn_svc_collection_init(&driver), CFN_HAL_ERROR_OK);
     EXPECT_EQ(driver.base.status, CFN_HAL_DRIVER_STATUS_INITIALIZED);
 }
@@ -71,18 +79,21 @@ TEST_F(CollectionTest, PushPopSizeSuccess)
 
     api.push_back = [](cfn_svc_collection_t *d, const void *item) -> cfn_hal_error_code_t
     {
+        (void) d;
         mock_val = *(const int *) item;
         return CFN_HAL_ERROR_OK;
     };
 
     api.pop_front = [](cfn_svc_collection_t *d, void *item_out) -> cfn_hal_error_code_t
     {
+        (void) d;
         *(int *) item_out = mock_val;
         return CFN_HAL_ERROR_OK;
     };
 
     api.get_size = [](cfn_svc_collection_t *d, size_t *s) -> cfn_hal_error_code_t
     {
+        (void) d;
         *s = 1;
         return CFN_HAL_ERROR_OK;
     };
@@ -100,6 +111,10 @@ TEST_F(CollectionTest, PushPopSizeSuccess)
 
 TEST_F(CollectionTest, ClearSuccess)
 {
-    api.clear = [](cfn_svc_collection_t *d) -> cfn_hal_error_code_t { return CFN_HAL_ERROR_OK; };
+    api.clear = [](cfn_svc_collection_t *d) -> cfn_hal_error_code_t
+    {
+        (void) d;
+        return CFN_HAL_ERROR_OK;
+    };
     EXPECT_EQ(cfn_svc_collection_clear(&driver), CFN_HAL_ERROR_OK);
 }

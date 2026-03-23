@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(caffeine-services
         VERSION 0.1.0
-        LANGUAGES C CXX
+        LANGUAGES C ASM
         DESCRIPTION "Header-only polymorphic middleware services layer for the Caffeine Framework"
         HOMEPAGE_URL "https://github.com/while-one/caffeine-services"
 )
@@ -12,7 +12,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-include(${PROJECT_SOURCE_DIR}/caffeine-build/cmake/CaffeineMacros.cmake)
+include(${PROJECT_SOURCE_DIR}/caffeine-build/cmake/CaffeineMacros.cmake OPTIONAL)
 
 # Useful for IDEs, clang-tidy, and clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -24,7 +24,7 @@ include(FetchContent)
 FetchContent_Declare(
     caffeine-hal
     GIT_REPOSITORY https://github.com/while-one/caffeine-hal.git
-    GIT_TAG        v0.4.5
+    GIT_TAG        v0.4.12
 )
 FetchContent_MakeAvailable(caffeine-hal)
 
@@ -160,12 +160,15 @@ if(CLANG_TIDY)
     add_custom_target(
         ${PROJECT_NAME}-tidy
         COMMAND ${CLANG_TIDY}
-        -p=${CMAKE_BINARY_DIR}
         --config-file=${PROJECT_SOURCE_DIR}/config/coding/.clang-tidy
         --header-filter="${PROJECT_SOURCE_DIR}/include/.*"
-        ${TEST_SOURCES}
+        ${ALL_HEADERS}
         ${PROJECT_SOURCE_DIR}/tests/compliance.c
-        COMMENT "Running clang-tidy static analysis using compile_commands.json..."
+        --
+        -I${PROJECT_SOURCE_DIR}/include
+        -I${caffeine-hal_SOURCE_DIR}/include
+        -std=c11
+        COMMENT "Running clang-tidy static analysis..."
     )
     
     if(TARGET ${PROJECT_NAME}-analyze)

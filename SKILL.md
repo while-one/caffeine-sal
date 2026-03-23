@@ -20,12 +20,12 @@ You are acting as an expert embedded software architect and middleware specialis
 Every new service header (e.g., `cfn_svc_myservice.h`) must follow this exact structure:
 1.  **FourCC Definition:** `#define CFN_SVC_TYPE_MYSERVICE CFN_SVC_TYPE('M', 'Y', 'S')`
 2.  **State/Enum Definitions:** Nominal events and exception errors.
-3.  **Physical Mapping Struct:** `cfn_svc_myservice_phy_t` (references to handles/pins).
+3.  **Physical Mapping:** Uses the generic `cfn_svc_phy_t` from `cfn_svc_types.h`.
 4.  **Configuration Struct:** `cfn_svc_myservice_config_t`.
 5.  **API VMT Struct:** `struct cfn_svc_myservice_api_s` with `cfn_hal_api_base_t base` as the FIRST member.
 6.  **VMT Compatibility Check:** `CFN_HAL_VMT_CHECK(struct cfn_svc_myservice_api_s);`
 7.  **Driver Type Creation:** `CFN_SVC_CREATE_DRIVER_TYPE(...)`.
-8.  **Static Initializer:** `CFN_SVC_MYSERVICE_INITIALIZER(...)`.
+8.  **Population Function:** Every service must provide a `cfn_svc_<name>_populate` function (inline).
 
 ### C. Resource Management
 *   **Static Allocation Only:** No `malloc` or `free`. All service state and buffers must be provided by the caller (typically as static objects in the application layer).
@@ -96,7 +96,26 @@ size_t written = 0;
 cfn_svc_serialization_encode(&json_driver, &telemetry_schema, &my_data, buffer, sizeof(buffer), &written);
 ```
 
-## 8. Contribution Workflow
+## 8. Combination Sensor Support (Shared Context Pattern)
+When a single physical IC provides multiple logical services (e.g., a BME280 providing Temperature, Humidity, and Pressure), we use the **Shared Context Pattern**.
+
+### A. The Shared Context
+A shared context structure must be defined in the implementation layer, with `cfn_svc_shared_ctx_t` as its FIRST member. This enables reference-counted initialization.
+
+```c
+typedef struct {
+    cfn_svc_shared_ctx_t base;
+    // IC specific calibration/state
+} my_combo_ctx_t;
+```
+
+### B. Shared Lifecycle
+All logical interfaces for the combo sensor share the same `init` and `deinit` implementation, using the `cfn_svc_shared_ctx_should_init()` and `cfn_svc_shared_ctx_should_deinit()` helpers. This ensures the physical bus/hardware is only touched during the first `init()` and last `deinit()`.
+
+### C. Interface Decoupling
+The user instantiates separate service drivers (e.g., `cfn_svc_temp_sensor_t` and `cfn_svc_hum_sensor_t`) but points their `phy->user_arg` to the same shared context instance. This maintains strict single-responsibility at the application level.
+
+## 9. Contribution Workflow
 
 1.  **Draft the Header:** Create the VMT and wrappers in the appropriate subdirectory.
 2.  **Add Test:** Create `tests/cfn_svc_test_<name>.cpp` and implement the Big 4.

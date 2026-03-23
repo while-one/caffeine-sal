@@ -14,6 +14,7 @@ extern "C"
 /* Includes ---------------------------------------------------------*/
 #include "cfn_hal.h"
 #include "cfn_hal_base.h"
+#include "cfn_svc_types.h"
 
 /* Defines ----------------------------------------------------------*/
 
@@ -33,13 +34,6 @@ extern "C"
  * Offsets service errors from HAL errors to avoid collisions.
  */
 #define CFN_SVC_ERROR_BASE 0x600
-
-/**
- * @brief Generic macro for Service static initializers.
- * Reuses the HAL initialization logic since Services use the same base driver container.
- */
-#define CFN_SVC_DRIVER_INITIALIZER(type_code, api_ptr, phy_ptr, config_ptr)                                            \
-    CFN_HAL_DRIVER_INITIALIZER(type_code, api_ptr, phy_ptr, config_ptr)
 
 #define CFN_SVC_CREATE_DRIVER_TYPE(prefix, config_type, api_type, phy_type, cb_type)                                   \
     struct cfn_##prefix##_s                                                                                            \

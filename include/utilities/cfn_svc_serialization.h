@@ -16,7 +16,6 @@ extern "C"
 /* Includes ---------------------------------------------------------*/
 #include <stddef.h>
 #include "cfn_svc.h"
-#include "cfn_svc_types.h"
 
 /* Defines ----------------------------------------------------------*/
 
@@ -26,15 +25,15 @@ extern "C"
  * @brief Helper macros for defining serialization schemas.
  */
 #define CFN_SVC_SCHEMA_START(name) static const cfn_svc_schema_field_t name##_fields[] = {
-#define CFN_SVC_SCHEMA_FIELD(f_name, f_type, struct_type, member)                                                     \
+#define CFN_SVC_SCHEMA_FIELD(f_name, f_type, struct_type, member)                                                      \
     {                                                                                                                  \
-        .name = f_name, .type = f_type, .offset = (uint16_t) offsetof(struct_type, member),                            \
-        .size = (uint16_t) sizeof(((struct_type *) 0)->member)                                                         \
+        .name = (f_name), .type = (f_type), .offset = (uint16_t) offsetof((struct_type), (member)),                            \
+        .size = (uint16_t) sizeof(((struct_type *) 0)->(member))                                                         \
     }
 #define CFN_SVC_SCHEMA_END(name)                                                                                       \
     }                                                                                                                  \
     ;                                                                                                                  \
-    static const cfn_svc_schema_t name = {.fields = name##_fields, .count = CFN_HAL_ARRAY_SIZE(name##_fields)};
+    static const cfn_svc_schema_t name = { .fields = name##_fields, .count = CFN_HAL_ARRAY_SIZE(name##_fields) };
 
 /* Types Enums ------------------------------------------------------*/
 
@@ -71,16 +70,16 @@ typedef struct
 typedef struct
 {
     const cfn_svc_schema_field_t *fields;
-    size_t                       count;
+    size_t                        count;
 } cfn_svc_schema_t;
 
 typedef struct cfn_svc_serialization_s     cfn_svc_serialization_t;
 typedef struct cfn_svc_serialization_api_s cfn_svc_serialization_api_t;
 
 typedef void (*cfn_svc_serialization_callback_t)(cfn_svc_serialization_t *driver,
-                                                  uint32_t                event,
-                                                  uint32_t                error,
-                                                  void                   *user_arg);
+                                                 uint32_t                 event,
+                                                 uint32_t                 error,
+                                                 void                    *user_arg);
 
 /**
  * @brief Virtual Method Table for Serialization Services.
@@ -114,33 +113,26 @@ CFN_HAL_VMT_CHECK(struct cfn_svc_serialization_api_s);
 
 typedef struct
 {
-    void *instance; /*!< Specific codec instance if needed */
-} cfn_svc_serialization_phy_t;
-
-typedef struct
-{
     void *custom; /*!< Codec-specific configuration */
 } cfn_svc_serialization_config_t;
 
 struct cfn_svc_serialization_s
 {
-    cfn_hal_driver_t                base;
+    cfn_hal_driver_t                      base;
     const cfn_svc_serialization_api_t    *api;
-    const cfn_svc_serialization_phy_t    *phy;
+    const cfn_svc_phy_t                  *phy;
     const cfn_svc_serialization_config_t *config;
     cfn_svc_serialization_callback_t      cb;
-    void                           *cb_user_arg;
+    void                                 *cb_user_arg;
 };
-
-#define CFN_SVC_SERIALIZATION_INITIALIZER(api_ptr, phy_ptr, config_ptr)                                               \
-    CFN_SVC_DRIVER_INITIALIZER(CFN_SVC_TYPE_SERIALIZATION, api_ptr, phy_ptr, config_ptr)
+typedef struct cfn_svc_serialization_s cfn_svc_serialization_t;
 
 /* Functions inline ------------------------------------------------- */
 
 CFN_HAL_INLINE void cfn_svc_serialization_populate(cfn_svc_serialization_t              *driver,
                                                    uint32_t                              peripheral_id,
                                                    const cfn_svc_serialization_api_t    *api,
-                                                   const cfn_svc_serialization_phy_t    *phy,
+                                                   const cfn_svc_phy_t                  *phy,
                                                    const cfn_svc_serialization_config_t *config,
                                                    cfn_svc_serialization_callback_t      callback,
                                                    void                                 *user_arg)
@@ -150,16 +142,16 @@ CFN_HAL_INLINE void cfn_svc_serialization_populate(cfn_svc_serialization_t      
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SVC_TYPE_SERIALIZATION, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api         = api;
-    driver->phy         = phy;
-    driver->config      = config;
-    driver->cb          = callback;
+    driver->api = api;
+    driver->phy = phy;
+    driver->config = config;
+    driver->cb = callback;
     driver->cb_user_arg = user_arg;
 }
 
 cfn_hal_error_code_t cfn_svc_serialization_construct(cfn_svc_serialization_t              *driver,
                                                      const cfn_svc_serialization_config_t *config,
-                                                     const cfn_svc_serialization_phy_t    *phy,
+                                                     const cfn_svc_phy_t                  *phy,
                                                      cfn_svc_serialization_callback_t      callback,
                                                      void                                 *user_arg);
 
@@ -183,8 +175,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_serialization_encode(cfn_svc_seriali
                                                                  size_t                  *bytes_written)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
-    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_SERIALIZATION, encode, driver, error, schema, data_ptr, out_buf,
-                                     out_size, bytes_written);
+    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(
+        CFN_SVC_TYPE_SERIALIZATION, encode, driver, error, schema, data_ptr, out_buf, out_size, bytes_written);
     return error;
 }
 
@@ -196,8 +188,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_serialization_decode(cfn_svc_seriali
                                                                  size_t                  *bytes_read)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
-    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_SERIALIZATION, decode, driver, error, schema, in_buf, in_size,
-                                     data_ptr, bytes_read);
+    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(
+        CFN_SVC_TYPE_SERIALIZATION, decode, driver, error, schema, in_buf, in_size, data_ptr, bytes_read);
     return error;
 }
 

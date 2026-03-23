@@ -13,7 +13,6 @@ extern "C"
 
 /* Includes ---------------------------------------------------------*/
 #include "cfn_svc.h"
-#include "cfn_svc_types.h"
 
 /* Defines ----------------------------------------------------------*/
 
@@ -25,16 +24,6 @@ extern "C"
 /* Types Enums ------------------------------------------------------*/
 
 /* Types Structs ----------------------------------------------------*/
-
-/**
- * @brief Collection physical mapping (e.g. underlying buffer and its size).
- */
-typedef struct
-{
-    void  *buffer;   /*!< Pointer to the static memory allocated for storage */
-    size_t size;     /*!< Size of the buffer in bytes or elements (implementation-defined) */
-    void  *user_arg; /*!< implementation-specific metadata */
-} cfn_svc_collection_phy_t;
 
 /**
  * @brief Collection configuration (e.g. item size).
@@ -91,38 +80,37 @@ CFN_HAL_VMT_CHECK(struct cfn_svc_collection_api_s);
 CFN_SVC_CREATE_DRIVER_TYPE(svc_collection,
                            cfn_svc_collection_config_t,
                            cfn_svc_collection_api_t,
-                           cfn_svc_collection_phy_t,
+                           cfn_svc_phy_t,
                            cfn_svc_collection_callback_t);
-
-#define CFN_SVC_COLLECTION_INITIALIZER(api_ptr, phy_ptr, config_ptr)                                                   \
-    CFN_SVC_DRIVER_INITIALIZER(CFN_SVC_TYPE_COLLECTION, api_ptr, phy_ptr, config_ptr)
 
 /* Functions inline ------------------------------------------------- */
 
 CFN_HAL_INLINE void cfn_svc_collection_populate(cfn_svc_collection_t              *driver,
-                                         uint32_t                    peripheral_id,
-                                         const cfn_svc_collection_api_t    *api,
-                                         const cfn_svc_collection_phy_t    *phy,
-                                         const cfn_svc_collection_config_t *config,
-                                         cfn_svc_collection_callback_t      callback,
-                                         void                       *user_arg)
+                                                uint32_t                           peripheral_id,
+                                                const cfn_svc_collection_api_t    *api,
+                                                const cfn_svc_phy_t               *phy,
+                                                const cfn_svc_collection_config_t *config,
+                                                cfn_svc_collection_callback_t      callback,
+                                                void                              *user_arg)
 {
     if (!driver)
     {
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SVC_TYPE_COLLECTION, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api         = api;
-    driver->phy         = phy;
-    driver->config      = config;
-    driver->cb          = callback;
+    driver->api = api;
+    driver->phy = phy;
+    driver->config = config;
+    driver->cb = callback;
     driver->cb_user_arg = user_arg;
 }
 
-cfn_hal_error_code_t cfn_svc_collection_construct(cfn_svc_collection_t *driver, const cfn_svc_collection_config_t *config, const cfn_svc_collection_phy_t *phy, cfn_svc_collection_callback_t callback, void *user_arg);
+cfn_hal_error_code_t cfn_svc_collection_construct(cfn_svc_collection_t              *driver,
+                                                  const cfn_svc_collection_config_t *config,
+                                                  const cfn_svc_phy_t               *phy,
+                                                  cfn_svc_collection_callback_t      callback,
+                                                  void                              *user_arg);
 cfn_hal_error_code_t cfn_svc_collection_destruct(cfn_svc_collection_t *driver);
-
-
 
 /**
  * @brief Initializes the collection.

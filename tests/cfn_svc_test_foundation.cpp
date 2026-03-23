@@ -18,15 +18,29 @@ typedef struct
     void *dummy;
 } dummy_svc_config_t;
 
-typedef struct
-{
-    void *instance;
-} dummy_svc_phy_t;
-
 typedef void (*dummy_svc_callback_t)(void *driver, uint32_t event, uint32_t error, void *arg);
 
-CFN_HAL_CREATE_DRIVER_TYPE(
-    dummy_svc, dummy_svc_config_t, struct dummy_svc_api_s, dummy_svc_phy_t, dummy_svc_callback_t);
+CFN_SVC_CREATE_DRIVER_TYPE(dummy_svc, dummy_svc_config_t, struct dummy_svc_api_s, cfn_svc_phy_t, dummy_svc_callback_t);
+
+CFN_HAL_INLINE void cfn_dummy_svc_populate(cfn_dummy_svc_t              *driver,
+                                           uint32_t                      peripheral_id,
+                                           const struct dummy_svc_api_s *api,
+                                           const cfn_svc_phy_t          *phy,
+                                           const dummy_svc_config_t     *config,
+                                           dummy_svc_callback_t          callback,
+                                           void                         *user_arg)
+{
+    if (!driver)
+    {
+        return;
+    }
+    cfn_hal_base_populate(&driver->base, peripheral_id, peripheral_id, api ? &api->base : NULL, NULL);
+    driver->api = api;
+    driver->phy = phy;
+    driver->config = config;
+    driver->cb = callback;
+    driver->cb_user_arg = user_arg;
+}
 
 TEST(FoundationTest, FourCCGeneration)
 {
@@ -38,13 +52,14 @@ TEST(FoundationTest, FourCCGeneration)
     EXPECT_EQ((type >> 24) & 0xFF, 'M');
 }
 
-TEST(FoundationTest, DriverInitializer)
+TEST(FoundationTest, DriverPopulate)
 {
     struct dummy_svc_api_s api = {};
-    dummy_svc_phy_t        phy = {};
+    cfn_svc_phy_t          phy = {};
     dummy_svc_config_t     config = {};
 
-    cfn_hal_dummy_svc_t driver = CFN_SVC_DRIVER_INITIALIZER(CFN_SVC_TYPE('D', 'U', 'M'), &api, &phy, &config);
+    cfn_dummy_svc_t driver{};
+    cfn_dummy_svc_populate(&driver, CFN_SVC_TYPE('D', 'U', 'M'), &api, &phy, &config, NULL, NULL);
 
     EXPECT_EQ(driver.base.type, CFN_SVC_TYPE('D', 'U', 'M'));
     EXPECT_EQ(driver.base.status, CFN_HAL_DRIVER_STATUS_CONSTRUCTED);

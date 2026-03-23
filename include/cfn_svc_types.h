@@ -1,6 +1,6 @@
 /**
  * @file cfn_svc_types.h
- * @brief Common type definitions and error codes for Caffeine Services.
+ * @brief Common types for Caffeine Services.
  */
 
 #ifndef CAFFEINE_SERVICES_CFN_SVC_TYPES_H
@@ -11,64 +11,79 @@ extern "C"
 {
 #endif
 
-/* Includes ---------------------------------------------------------*/
-#include "cfn_hal_types.h"
-#include "cfn_svc.h"
-
-/* Defines ----------------------------------------------------------*/
-
-/* Types Enums ------------------------------------------------------*/
+#include <stdint.h>
+#include <stdbool.h>
+#include "cfn_hal.h"
 
 /**
- * @brief Service-level error codes.
- * Extends the cfn_hal_error_code_t space starting from CFN_SVC_ERROR_BASE (0x600).
+ * @brief Generic physical mapping for services.
+ *
+ * This structure serves as the foundational physical interface (PHY) for services
+ * that interact with HAL peripherals (e.g., I2C, SPI, UART). It is designed to be
+ * extensible by embedding it as the first member of a specialized PHY structure.
  */
-typedef enum
+typedef struct
 {
-    CFN_SVC_ERROR_OK = CFN_HAL_ERROR_OK,
+    void    *handle;   /*!< Pointer to the HAL peripheral driver (e.g., cfn_hal_i2c_t *) */
+    void    *instance; /*!< Addressing info: I2C device address, SPI CS pin handle, etc. */
+    uint32_t type;     /*!< Peripheral type identifier (e.g., CFN_HAL_PERIPHERAL_TYPE_I2C) */
+    void    *user_arg; /*!< Optional custom argument for shared contexts or callbacks */
+} cfn_svc_phy_t;
 
-    /* Collection Specific Errors */
-    CFN_SVC_ERROR_COLLECTION_FULL = CFN_SVC_ERROR_BASE,
-    CFN_SVC_ERROR_COLLECTION_EMPTY,
-    CFN_SVC_ERROR_COLLECTION_NOT_FOUND,
+#define CFN_SVC_PHY_INITIALIZER(_handle, _instance, _type, _user_arg)                                                  \
+    {                                                                                                                  \
+        .handle = (_handle), .instance = (_instance), .type = (_type), .user_arg = (_user_arg)                         \
+    }
 
-    /* Sensor Specific Errors */
-    CFN_SVC_ERROR_SENSOR_COMM_FAIL = 0x700,
-    CFN_SVC_ERROR_SENSOR_DATA_INVALID,
+/**
+ * @brief Foundational reference counter for shared combination sensor contexts.
+ */
+typedef struct
+{
+    uint8_t              ref_count;
+    cfn_hal_error_code_t last_init_error;
+} cfn_svc_shared_ctx_t;
 
-    /* Communication Specific Errors */
-    CFN_SVC_ERROR_AT_RESPONSE_TIMEOUT = 0x800,
-    CFN_SVC_ERROR_AT_RESPONSE_ERROR,
-    CFN_SVC_ERROR_COMM_NOT_REGISTERED,
+/**
+ * @brief Static initializer for a shared context.
+ */
+#define CFN_SVC_SHARED_CTX_INITIALIZER()                                                                               \
+    {                                                                                                                  \
+        .ref_count = 0, .last_init_error = CFN_HAL_ERROR_OK                                                            \
+    }
 
-    /* File System Specific Errors */
-    CFN_SVC_ERROR_FS_MOUNT_FAILED = 0x900,
-    CFN_SVC_ERROR_FS_NO_MEDIA,
-    CFN_SVC_ERROR_FS_NOT_FOUND,
-    CFN_SVC_ERROR_FS_ALREADY_EXISTS,
-    CFN_SVC_ERROR_FS_FULL,
+/**
+ * @brief Safely increments the reference count.
+ * @return true if this is the first initialization (hardware should be initialized).
+ */
+static inline bool cfn_svc_shared_ctx_should_init(cfn_svc_shared_ctx_t *ctx)
+{
+    if (!ctx)
+    {
+        return false;
+    }
+    if (ctx->ref_count == 0)
+    {
+        ctx->ref_count++;
+        return true;
+    }
+    ctx->ref_count++;
+    return false;
+}
 
-    /* Connection Specific Errors */
-    CFN_SVC_ERROR_CON_NOT_CONNECTED = 0xA00,
-    CFN_SVC_ERROR_CON_DNS_FAILED,
-    CFN_SVC_ERROR_CON_TIMEOUT,
-    CFN_SVC_ERROR_CON_REFUSED,
-    CFN_SVC_ERROR_CON_AUTH_FAILED,
-
-    /* Transport Specific Errors */
-    CFN_SVC_ERROR_TPT_BUSY = 0xB00,
-    CFN_SVC_ERROR_TPT_OVERFLOW,
-    CFN_SVC_ERROR_TPT_FRAMING,
-
-    /* Serialization Specific Errors */
-    CFN_SVC_ERROR_SER_BUFFER_OVERFLOW = 0xC00,
-    CFN_SVC_ERROR_SER_SCHEMA_MISMATCH,
-    CFN_SVC_ERROR_SER_INVALID_TYPE,
-    CFN_SVC_ERROR_SER_UNSUPPORTED_FORMAT,
-
-} cfn_svc_error_code_t;
-
-/* Types Structs ----------------------------------------------------*/
+/**
+ * @brief Safely decrements the reference count.
+ * @return true if this is the final deinitialization (hardware should be turned off).
+ */
+static inline bool cfn_svc_shared_ctx_should_deinit(cfn_svc_shared_ctx_t *ctx)
+{
+    if (!ctx || ctx->ref_count == 0)
+    {
+        return false;
+    }
+    ctx->ref_count--;
+    return (ctx->ref_count == 0);
+}
 
 #ifdef __cplusplus
 }

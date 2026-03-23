@@ -14,7 +14,6 @@ extern "C"
 /* Includes ---------------------------------------------------------*/
 #include <time.h>
 #include "cfn_svc.h"
-#include "cfn_svc_types.h"
 
 /* Defines ----------------------------------------------------------*/
 
@@ -56,12 +55,6 @@ typedef struct
 
 typedef struct
 {
-    void *instance; /*!< Mapping to UART handle or I2C/SPI driver */
-    void *user_arg;
-} cfn_svc_gnss_phy_t;
-
-typedef struct
-{
     uint32_t fix_rate_ms;
     uint32_t baudrate; /* If UART based */
     void    *custom;
@@ -99,38 +92,36 @@ struct cfn_svc_gnss_api_s
 
 CFN_HAL_VMT_CHECK(struct cfn_svc_gnss_api_s);
 
-CFN_SVC_CREATE_DRIVER_TYPE(
-    svc_gnss, cfn_svc_gnss_config_t, cfn_svc_gnss_api_t, cfn_svc_gnss_phy_t, cfn_svc_gnss_callback_t);
-
-#define CFN_SVC_GNSS_INITIALIZER(api_ptr, phy_ptr, config_ptr)                                                         \
-    CFN_SVC_DRIVER_INITIALIZER(CFN_SVC_TYPE_GNSS, api_ptr, phy_ptr, config_ptr)
+CFN_SVC_CREATE_DRIVER_TYPE(svc_gnss, cfn_svc_gnss_config_t, cfn_svc_gnss_api_t, cfn_svc_phy_t, cfn_svc_gnss_callback_t);
 
 /* Functions inline ------------------------------------------------- */
 
 CFN_HAL_INLINE void cfn_svc_gnss_populate(cfn_svc_gnss_t              *driver,
-                                         uint32_t                    peripheral_id,
-                                         const cfn_svc_gnss_api_t    *api,
-                                         const cfn_svc_gnss_phy_t    *phy,
-                                         const cfn_svc_gnss_config_t *config,
-                                         cfn_svc_gnss_callback_t      callback,
-                                         void                       *user_arg)
+                                          uint32_t                     peripheral_id,
+                                          const cfn_svc_gnss_api_t    *api,
+                                          const cfn_svc_phy_t         *phy,
+                                          const cfn_svc_gnss_config_t *config,
+                                          cfn_svc_gnss_callback_t      callback,
+                                          void                        *user_arg)
 {
     if (!driver)
     {
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SVC_TYPE_GNSS, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api         = api;
-    driver->phy         = phy;
-    driver->config      = config;
-    driver->cb          = callback;
+    driver->api = api;
+    driver->phy = phy;
+    driver->config = config;
+    driver->cb = callback;
     driver->cb_user_arg = user_arg;
 }
 
-cfn_hal_error_code_t cfn_svc_gnss_construct(cfn_svc_gnss_t *driver, const cfn_svc_gnss_config_t *config, const cfn_svc_gnss_phy_t *phy, cfn_svc_gnss_callback_t callback, void *user_arg);
+cfn_hal_error_code_t cfn_svc_gnss_construct(cfn_svc_gnss_t              *driver,
+                                            const cfn_svc_gnss_config_t *config,
+                                            const cfn_svc_phy_t         *phy,
+                                            cfn_svc_gnss_callback_t      callback,
+                                            void                        *user_arg);
 cfn_hal_error_code_t cfn_svc_gnss_destruct(cfn_svc_gnss_t *driver);
-
-
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gnss_init(cfn_svc_gnss_t *driver)
 {
