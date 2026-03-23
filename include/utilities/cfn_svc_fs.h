@@ -82,6 +82,31 @@ CFN_SVC_CREATE_DRIVER_TYPE(svc_fs, cfn_svc_fs_config_t, cfn_svc_fs_api_t, cfn_sv
 
 /* Functions inline ------------------------------------------------- */
 
+CFN_HAL_INLINE void cfn_svc_fs_populate(cfn_svc_fs_t              *driver,
+                                         uint32_t                    peripheral_id,
+                                         const cfn_svc_fs_api_t    *api,
+                                         const cfn_svc_fs_phy_t    *phy,
+                                         const cfn_svc_fs_config_t *config,
+                                         cfn_svc_fs_callback_t      callback,
+                                         void                       *user_arg)
+{
+    if (!driver)
+    {
+        return;
+    }
+    cfn_hal_base_populate(&driver->base, CFN_SVC_TYPE_FS, peripheral_id, api ? &api->base : NULL, NULL);
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
+    driver->cb_user_arg = user_arg;
+}
+
+cfn_hal_error_code_t cfn_svc_fs_construct(cfn_svc_fs_t *driver, const cfn_svc_fs_config_t *config, const cfn_svc_fs_phy_t *phy, cfn_svc_fs_callback_t callback, void *user_arg);
+cfn_hal_error_code_t cfn_svc_fs_destruct(cfn_svc_fs_t *driver);
+
+
+
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_fs_init(cfn_svc_fs_t *driver)
 {
     if (!driver)

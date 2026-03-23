@@ -82,6 +82,31 @@ CFN_SVC_CREATE_DRIVER_TYPE(
 
 /* Functions inline ------------------------------------------------- */
 
+CFN_HAL_INLINE void cfn_svc_display_populate(cfn_svc_display_t              *driver,
+                                         uint32_t                    peripheral_id,
+                                         const cfn_svc_display_api_t    *api,
+                                         const cfn_svc_display_phy_t    *phy,
+                                         const cfn_svc_display_config_t *config,
+                                         cfn_svc_display_callback_t      callback,
+                                         void                       *user_arg)
+{
+    if (!driver)
+    {
+        return;
+    }
+    cfn_hal_base_populate(&driver->base, CFN_SVC_TYPE_DISPLAY, peripheral_id, api ? &api->base : NULL, NULL);
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
+    driver->cb_user_arg = user_arg;
+}
+
+cfn_hal_error_code_t cfn_svc_display_construct(cfn_svc_display_t *driver, const cfn_svc_display_config_t *config, const cfn_svc_display_phy_t *phy, cfn_svc_display_callback_t callback, void *user_arg);
+cfn_hal_error_code_t cfn_svc_display_destruct(cfn_svc_display_t *driver);
+
+
+
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_display_init(cfn_svc_display_t *driver)
 {
     if (!driver)

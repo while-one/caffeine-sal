@@ -68,7 +68,35 @@ All new service interfaces MUST have a corresponding unit test in `tests/`.
 *   `include/cfn_svc.h`: Core macro definitions.
 *   `include/cfn_svc_types.h`: Shared service-layer types.
 
-## 7. Contribution Workflow
+## 7. Serialization Layer & Schemas
+The serialization layer (`include/utilities/cfn_svc_serialization.h`) provides a generic way to encode/decode C structures into wire formats (JSON, Binary, etc.) without heap allocation.
+
+### A. Defining a Schema
+Use the provided macros to create a static schema descriptor. This descriptor allows the serialization driver to introspect your structure.
+
+```c
+typedef struct {
+    int32_t temperature;
+    float humidity;
+    bool alarm_active;
+} telemetry_t;
+
+CFN_SVC_SCHEMA_START(telemetry_schema)
+    CFN_SVC_SCHEMA_FIELD("temp",  CFN_SVC_SCHEMA_FIELD_TYPE_INT32, telemetry_t, temperature),
+    CFN_SVC_SCHEMA_FIELD("hum",   CFN_SVC_SCHEMA_FIELD_TYPE_FLOAT, telemetry_t, humidity),
+    CFN_SVC_SCHEMA_FIELD("alarm", CFN_SVC_SCHEMA_FIELD_TYPE_BOOL,  telemetry_t, alarm_active),
+CFN_SVC_SCHEMA_END(telemetry_schema)
+```
+
+### B. Usage
+Drivers are implementation-specific (e.g., JSON or CBOR) but share the same generic interface.
+
+```c
+size_t written = 0;
+cfn_svc_serialization_encode(&json_driver, &telemetry_schema, &my_data, buffer, sizeof(buffer), &written);
+```
+
+## 8. Contribution Workflow
 
 1.  **Draft the Header:** Create the VMT and wrappers in the appropriate subdirectory.
 2.  **Add Test:** Create `tests/cfn_svc_test_<name>.cpp` and implement the Big 4.

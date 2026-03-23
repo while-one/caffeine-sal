@@ -12,6 +12,8 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
+include(${PROJECT_SOURCE_DIR}/caffeine-build/cmake/CaffeineMacros.cmake)
+
 # Useful for IDEs, clang-tidy, and clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -29,6 +31,8 @@ FetchContent_MakeAvailable(caffeine-hal)
 # --- Component Configuration ---
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(caffeine::services ALIAS ${PROJECT_NAME})
+
+target_compile_options(${PROJECT_NAME} INTERFACE ${CAFFEINE_COMPILE_OPTIONS})
 
 # Consistent naming for exported target
 set_target_properties(${PROJECT_NAME} PROPERTIES EXPORT_NAME services)

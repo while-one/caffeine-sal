@@ -60,6 +60,12 @@ typedef enum
     CFN_SVC_ERROR_TPT_OVERFLOW,
     CFN_SVC_ERROR_TPT_FRAMING,
 
+    /* Serialization Specific Errors */
+    CFN_SVC_ERROR_SER_BUFFER_OVERFLOW = 0xC00,
+    CFN_SVC_ERROR_SER_SCHEMA_MISMATCH,
+    CFN_SVC_ERROR_SER_INVALID_TYPE,
+    CFN_SVC_ERROR_SER_UNSUPPORTED_FORMAT,
+
 } cfn_svc_error_code_t;
 
 /* Types Structs ----------------------------------------------------*/
