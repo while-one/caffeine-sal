@@ -309,8 +309,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_accel_config_fifo(cfn_svc_accel_t *d
 }
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_accel_read_fifo(cfn_svc_accel_t      *driver,
-                                                           cfn_svc_accel_data_t *data,
-                                                           size_t               *count)
+                                                            cfn_svc_accel_data_t *data,
+                                                            size_t               *count)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_ACCEL, read_fifo, driver, error, data, count);
@@ -318,8 +318,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_accel_read_fifo(cfn_svc_accel_t     
 }
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_accel_config_tap_detection(cfn_svc_accel_t *driver,
-                                                                      bool              double_tap,
-                                                                      uint8_t           threshold)
+                                                                       bool             double_tap,
+                                                                       uint8_t          threshold)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_ACCEL, config_tap_detection, driver, error, double_tap, threshold);
@@ -327,8 +327,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_accel_config_tap_detection(cfn_svc_a
 }
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_accel_config_freefall(cfn_svc_accel_t *driver,
-                                                                 uint16_t          threshold_mg,
-                                                                 uint16_t          time_ms)
+                                                                  uint16_t         threshold_mg,
+                                                                  uint16_t         time_ms)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_ACCEL, config_freefall, driver, error, threshold_mg, time_ms);

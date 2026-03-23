@@ -340,11 +340,12 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_get_signal_quality_csq(cfn_svc_g
     return error;
 }
 
-CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_gsm_read_sms(
-    cfn_svc_gsm_t *driver, uint16_t index, char *number_out, char *message_out, size_t max_len)
+CFN_HAL_INLINE cfn_hal_error_code_t
+cfn_svc_gsm_read_sms(cfn_svc_gsm_t *driver, uint16_t index, char *number_out, char *message_out, size_t max_len)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
-    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_GSM, read_sms, driver, error, index, number_out, message_out, max_len);
+    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(
+        CFN_SVC_TYPE_GSM, read_sms, driver, error, index, number_out, message_out, max_len);
     return error;
 }
 

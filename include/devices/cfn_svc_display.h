@@ -301,8 +301,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_display_set_backlight(cfn_svc_displa
     return error;
 }
 
-CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_display_draw_line(
-    cfn_svc_display_t *driver, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint32_t color)
+CFN_HAL_INLINE cfn_hal_error_code_t
+cfn_svc_display_draw_line(cfn_svc_display_t *driver, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint32_t color)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_DISPLAY, draw_line, driver, error, x0, y0, x1, y1, color);
@@ -333,8 +333,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_display_set_cursor(cfn_svc_display_t
 }
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_display_write_data(cfn_svc_display_t *driver,
-                                                              const uint8_t     *data,
-                                                              size_t             len)
+                                                               const uint8_t     *data,
+                                                               size_t             len)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_DISPLAY, write_data, driver, error, data, len);

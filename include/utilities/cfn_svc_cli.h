@@ -276,8 +276,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_cli_clear_screen(cfn_svc_cli_t *driv
 }
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_cli_register_command_simple(cfn_svc_cli_t *driver,
-                                                                       const char    *cmd,
-                                                                       void          *callback)
+                                                                        const char    *cmd,
+                                                                        void          *callback)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_CLI, register_command_simple, driver, error, cmd, callback);

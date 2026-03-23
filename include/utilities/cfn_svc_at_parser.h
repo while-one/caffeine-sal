@@ -50,9 +50,9 @@ struct cfn_svc_at_parser_api_s
     /* Basic Exchange */
     cfn_hal_error_code_t (*send_command)(cfn_svc_at_parser_t *driver, const char *cmd);
     cfn_hal_error_code_t (*send_command_wait_resp)(cfn_svc_at_parser_t *driver,
-                                                   const char         *cmd,
-                                                   const char         *expected_resp,
-                                                   uint32_t            timeout_ms);
+                                                   const char          *cmd,
+                                                   const char          *expected_resp,
+                                                   uint32_t             timeout_ms);
     cfn_hal_error_code_t (*send_data)(cfn_svc_at_parser_t *driver, const uint8_t *data, size_t len);
     cfn_hal_error_code_t (*read_response)(cfn_svc_at_parser_t *driver,
                                           char                *buffer,
@@ -64,9 +64,7 @@ struct cfn_svc_at_parser_api_s
                                          const char               *prefix,
                                          cfn_svc_at_urc_callback_t cb,
                                          void                     *user_arg);
-    cfn_hal_error_code_t (*register_urc_simple)(cfn_svc_at_parser_t *driver,
-                                                const char         *urc_string,
-                                                void               *callback);
+    cfn_hal_error_code_t (*register_urc_simple)(cfn_svc_at_parser_t *driver, const char *urc_string, void *callback);
     cfn_hal_error_code_t (*unregister_urc)(cfn_svc_at_parser_t *driver, const char *prefix);
 
     /* Flow Control */
@@ -283,9 +281,9 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_at_flush_rx(cfn_svc_at_parser_t *dri
 }
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_at_send_command_wait_resp(cfn_svc_at_parser_t *driver,
-                                                                     const char         *cmd,
-                                                                     const char         *expected_resp,
-                                                                     uint32_t            timeout_ms)
+                                                                      const char          *cmd,
+                                                                      const char          *expected_resp,
+                                                                      uint32_t             timeout_ms)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(
@@ -293,8 +291,9 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_at_send_command_wait_resp(cfn_svc_at
     return error;
 }
 
-CFN_HAL_INLINE cfn_hal_error_code_t
-cfn_svc_at_register_urc_simple(cfn_svc_at_parser_t *driver, const char *urc_string, void *callback)
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_at_register_urc_simple(cfn_svc_at_parser_t *driver,
+                                                                   const char          *urc_string,
+                                                                   void                *callback)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_AT_PARSER, register_urc_simple, driver, error, urc_string, callback);

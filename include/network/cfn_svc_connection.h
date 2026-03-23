@@ -82,9 +82,9 @@ struct cfn_svc_connection_api_s
     cfn_hal_error_code_t (*get_gateway)(cfn_svc_connection_t *driver, uint8_t *ip_buf);
     cfn_hal_error_code_t (*get_dns)(cfn_svc_connection_t *driver, uint8_t *ip_buf);
     cfn_hal_error_code_t (*set_static_ip)(cfn_svc_connection_t *driver,
-                                          const uint8_t       *ip,
-                                          const uint8_t       *mask,
-                                          const uint8_t       *gateway);
+                                          const uint8_t        *ip,
+                                          const uint8_t        *mask,
+                                          const uint8_t        *gateway);
 };
 
 CFN_HAL_VMT_CHECK(struct cfn_svc_connection_api_s);
@@ -276,8 +276,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_connection_get_info(cfn_svc_connecti
 }
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_connection_scan_networks(cfn_svc_connection_t *driver,
-                                                                    void                 *results_array,
-                                                                    size_t                max_count)
+                                                                     void                 *results_array,
+                                                                     size_t                max_count)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_CONNECTION, scan_networks, driver, error, results_array, max_count);
@@ -313,13 +313,12 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_connection_get_dns(cfn_svc_connectio
 }
 
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_connection_set_static_ip(cfn_svc_connection_t *driver,
-                                                                    const uint8_t       *ip,
-                                                                    const uint8_t       *mask,
-                                                                    const uint8_t       *gateway)
+                                                                     const uint8_t        *ip,
+                                                                     const uint8_t        *mask,
+                                                                     const uint8_t        *gateway)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
-    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(
-        CFN_SVC_TYPE_CONNECTION, set_static_ip, driver, error, ip, mask, gateway);
+    CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_CONNECTION, set_static_ip, driver, error, ip, mask, gateway);
     return error;
 }
 

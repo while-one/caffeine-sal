@@ -256,8 +256,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_log_set_level(cfn_svc_logging_t *dri
     return error;
 }
 
-CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_log_set_output_target(cfn_svc_logging_t *driver,
-                                                                 cfn_svc_log_target_t target)
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_log_set_output_target(cfn_svc_logging_t   *driver,
+                                                                  cfn_svc_log_target_t target)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_LOGGING, set_output_target, driver, error, target);

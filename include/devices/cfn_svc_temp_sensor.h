@@ -277,7 +277,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_temp_sensor_set_low_threshold(cfn_sv
     return error;
 }
 
-CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_temp_sensor_set_mode(cfn_svc_temp_sensor_t *driver, cfn_svc_temp_mode_t mode)
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_temp_sensor_set_mode(cfn_svc_temp_sensor_t *driver,
+                                                                 cfn_svc_temp_mode_t    mode)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_TEMP_SENSOR, set_mode, driver, error, mode);
@@ -298,7 +299,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_temp_sensor_set_oversampling(cfn_svc
     return error;
 }
 
-CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_temp_sensor_get_status(cfn_svc_temp_sensor_t *driver, uint32_t *status_flags)
+CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_temp_sensor_get_status(cfn_svc_temp_sensor_t *driver,
+                                                                   uint32_t              *status_flags)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_TEMP_SENSOR, get_status, driver, error, status_flags);

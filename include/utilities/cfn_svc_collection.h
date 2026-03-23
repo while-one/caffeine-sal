@@ -421,8 +421,8 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_collection_clear(cfn_svc_collection_
  * @brief Finds an item in the collection and retrieves its index.
  */
 CFN_HAL_INLINE cfn_hal_error_code_t cfn_svc_collection_find(cfn_svc_collection_t *driver,
-                                                           const void           *item,
-                                                           size_t               *index_out)
+                                                            const void           *item,
+                                                            size_t               *index_out)
 {
     cfn_hal_error_code_t error = CFN_HAL_ERROR_OK;
     CFN_HAL_CHECK_AND_CALL_FUNC_VARG(CFN_SVC_TYPE_COLLECTION, find, driver, error, item, index_out);
