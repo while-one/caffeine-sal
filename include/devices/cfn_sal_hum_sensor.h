@@ -28,7 +28,7 @@ typedef enum
 
 typedef enum
 {
-    CFN_SAL_HUM_EVENT_NONE = 0,
+    CFN_SAL_HUM_EVENT_NONE       = 0,
     CFN_SAL_HUM_EVENT_DATA_READY = CFN_HAL_BIT(0),
 } cfn_sal_hum_event_t;
 
@@ -85,10 +85,10 @@ CFN_HAL_INLINE void cfn_sal_hum_sensor_populate(cfn_sal_hum_sensor_t           *
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SAL_TYPE_HUM_SENSOR, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api = api;
-    driver->phy = phy;
-    driver->config = config;
-    driver->cb = callback;
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
 }
 
@@ -148,7 +148,7 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_sal_hum_sensor_callback_register(cfn_sal
     {
         return CFN_HAL_ERROR_BAD_PARAM;
     }
-    driver->cb = callback;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
     return cfn_hal_base_callback_register(
         &driver->base, CFN_SAL_TYPE_HUM_SENSOR, (cfn_hal_callback_t) callback, user_arg);

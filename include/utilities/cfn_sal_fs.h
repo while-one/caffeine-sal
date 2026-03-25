@@ -22,8 +22,8 @@ extern "C"
 
 typedef enum
 {
-    CFN_SAL_FS_MODE_READ = CFN_HAL_BIT(0),
-    CFN_SAL_FS_MODE_WRITE = CFN_HAL_BIT(1),
+    CFN_SAL_FS_MODE_READ   = CFN_HAL_BIT(0),
+    CFN_SAL_FS_MODE_WRITE  = CFN_HAL_BIT(1),
     CFN_SAL_FS_MODE_APPEND = CFN_HAL_BIT(2),
     CFN_SAL_FS_MODE_CREATE = CFN_HAL_BIT(3),
 } cfn_sal_fs_mode_t;
@@ -91,10 +91,10 @@ CFN_HAL_INLINE void cfn_sal_fs_populate(cfn_sal_fs_t              *driver,
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SAL_TYPE_FS, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api = api;
-    driver->phy = phy;
-    driver->config = config;
-    driver->cb = callback;
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
 }
 
@@ -152,7 +152,7 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_sal_fs_callback_register(cfn_sal_fs_t   
     {
         return CFN_HAL_ERROR_BAD_PARAM;
     }
-    driver->cb = callback;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
     return cfn_hal_base_callback_register(&driver->base, CFN_SAL_TYPE_FS, (cfn_hal_callback_t) callback, user_arg);
 }

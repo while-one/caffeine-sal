@@ -28,10 +28,10 @@ typedef enum
 
 typedef enum
 {
-    CFN_SAL_TEMP_EVENT_NONE = 0,
-    CFN_SAL_TEMP_EVENT_DATA_READY = CFN_HAL_BIT(0),
+    CFN_SAL_TEMP_EVENT_NONE           = 0,
+    CFN_SAL_TEMP_EVENT_DATA_READY     = CFN_HAL_BIT(0),
     CFN_SAL_TEMP_EVENT_THRESHOLD_HIGH = CFN_HAL_BIT(1),
-    CFN_SAL_TEMP_EVENT_THRESHOLD_LOW = CFN_HAL_BIT(2),
+    CFN_SAL_TEMP_EVENT_THRESHOLD_LOW  = CFN_HAL_BIT(2),
 } cfn_sal_temp_event_t;
 
 /* Types Structs ----------------------------------------------------*/
@@ -91,10 +91,10 @@ CFN_HAL_INLINE void cfn_sal_temp_sensor_populate(cfn_sal_temp_sensor_t          
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SAL_TYPE_TEMP_SENSOR, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api = api;
-    driver->phy = phy;
-    driver->config = config;
-    driver->cb = callback;
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
 }
 
@@ -154,7 +154,7 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_sal_temp_sensor_callback_register(cfn_sa
     {
         return CFN_HAL_ERROR_BAD_PARAM;
     }
-    driver->cb = callback;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
     return cfn_hal_base_callback_register(
         &driver->base, CFN_SAL_TYPE_TEMP_SENSOR, (cfn_hal_callback_t) callback, user_arg);

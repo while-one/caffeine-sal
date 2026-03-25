@@ -22,12 +22,12 @@ extern "C"
 
 typedef enum
 {
-    CFN_SAL_GSM_EVENT_NONE = 0,
-    CFN_SAL_GSM_EVENT_POWERED_ON = CFN_HAL_BIT(0),
+    CFN_SAL_GSM_EVENT_NONE               = 0,
+    CFN_SAL_GSM_EVENT_POWERED_ON         = CFN_HAL_BIT(0),
     CFN_SAL_GSM_EVENT_NETWORK_REGISTERED = CFN_HAL_BIT(1),
-    CFN_SAL_GSM_EVENT_SMS_RECEIVED = CFN_HAL_BIT(2),
-    CFN_SAL_GSM_EVENT_CALL_INCOMING = CFN_HAL_BIT(3),
-    CFN_SAL_GSM_EVENT_MQTT_CONNECTED = CFN_HAL_BIT(4),
+    CFN_SAL_GSM_EVENT_SMS_RECEIVED       = CFN_HAL_BIT(2),
+    CFN_SAL_GSM_EVENT_CALL_INCOMING      = CFN_HAL_BIT(3),
+    CFN_SAL_GSM_EVENT_MQTT_CONNECTED     = CFN_HAL_BIT(4),
 } cfn_sal_gsm_event_t;
 
 typedef enum
@@ -111,10 +111,10 @@ CFN_HAL_INLINE void cfn_sal_gsm_populate(cfn_sal_gsm_t              *driver,
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SAL_TYPE_GSM, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api = api;
-    driver->phy = phy;
-    driver->config = config;
-    driver->cb = callback;
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
 }
 
@@ -172,7 +172,7 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_sal_gsm_callback_register(cfn_sal_gsm_t 
     {
         return CFN_HAL_ERROR_BAD_PARAM;
     }
-    driver->cb = callback;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
     return cfn_hal_base_callback_register(&driver->base, CFN_SAL_TYPE_GSM, (cfn_hal_callback_t) callback, user_arg);
 }

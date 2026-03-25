@@ -35,10 +35,10 @@ class LedTest : public ::testing::Test
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SAL_TYPE_LED;
+        driver.base.type   = CFN_SAL_TYPE_LED;
         driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
-        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
-        driver.api = &api;
+        driver.base.vmt    = (const struct cfn_hal_api_base_s *) &api;
+        driver.api         = &api;
     }
 };
 
@@ -55,7 +55,7 @@ TEST_F(LedTest, LifecycleSuccess)
 TEST_F(LedTest, ToggleSuccess)
 {
     static bool toggled = false;
-    api.toggle = [](cfn_sal_led_t *d) -> cfn_hal_error_code_t
+    api.toggle          = [](cfn_sal_led_t *d) -> cfn_hal_error_code_t
     {
         (void) d;
         toggled = true;
@@ -77,10 +77,10 @@ class ConnectionTest : public ::testing::Test
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SAL_TYPE_CONNECTION;
+        driver.base.type   = CFN_SAL_TYPE_CONNECTION;
         driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
-        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
-        driver.api = &api;
+        driver.base.vmt    = (const struct cfn_hal_api_base_s *) &api;
+        driver.api         = &api;
     }
 };
 
@@ -106,10 +106,10 @@ class TransportTest : public ::testing::Test
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SAL_TYPE_TRANSPORT;
+        driver.base.type   = CFN_SAL_TYPE_TRANSPORT;
         driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
-        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
-        driver.api = &api;
+        driver.base.vmt    = (const struct cfn_hal_api_base_s *) &api;
+        driver.api         = &api;
     }
 };
 
@@ -152,10 +152,10 @@ class ButtonTest : public ::testing::Test
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SAL_TYPE_BUTTON;
+        driver.base.type   = CFN_SAL_TYPE_BUTTON;
         driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
-        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
-        driver.api = &api;
+        driver.base.vmt    = (const struct cfn_hal_api_base_s *) &api;
+        driver.api         = &api;
     }
 };
 
@@ -184,10 +184,10 @@ class BatteryTest : public ::testing::Test
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SAL_TYPE_BATTERY;
+        driver.base.type   = CFN_SAL_TYPE_BATTERY;
         driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
-        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
-        driver.api = &api;
+        driver.base.vmt    = (const struct cfn_hal_api_base_s *) &api;
+        driver.api         = &api;
     }
 };
 
@@ -216,10 +216,10 @@ class GnssTest : public ::testing::Test
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SAL_TYPE_GNSS;
+        driver.base.type   = CFN_SAL_TYPE_GNSS;
         driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
-        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
-        driver.api = &api;
+        driver.base.vmt    = (const struct cfn_hal_api_base_s *) &api;
+        driver.api         = &api;
     }
 };
 
@@ -248,10 +248,10 @@ class FsTest : public ::testing::Test
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SAL_TYPE_FS;
+        driver.base.type   = CFN_SAL_TYPE_FS;
         driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
-        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
-        driver.api = &api;
+        driver.base.vmt    = (const struct cfn_hal_api_base_s *) &api;
+        driver.api         = &api;
     }
 };
 
@@ -277,10 +277,10 @@ class LoggingTest : public ::testing::Test
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SAL_TYPE_LOGGING;
+        driver.base.type   = CFN_SAL_TYPE_LOGGING;
         driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
-        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
-        driver.api = &api;
+        driver.base.vmt    = (const struct cfn_hal_api_base_s *) &api;
+        driver.api         = &api;
     }
 };
 

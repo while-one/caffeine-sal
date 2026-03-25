@@ -35,10 +35,10 @@ CFN_HAL_INLINE void cfn_dummy_sal_populate(cfn_dummy_sal_t              *driver,
         return;
     }
     cfn_hal_base_populate(&driver->base, peripheral_id, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api = api;
-    driver->phy = phy;
-    driver->config = config;
-    driver->cb = callback;
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
 }
 
@@ -54,8 +54,8 @@ TEST(FoundationTest, FourCCGeneration)
 
 TEST(FoundationTest, DriverPopulate)
 {
-    struct dummy_sal_api_s api = {};
-    cfn_sal_phy_t          phy = {};
+    struct dummy_sal_api_s api    = {};
+    cfn_sal_phy_t          phy    = {};
     dummy_sal_config_t     config = {};
 
     cfn_dummy_sal_t driver{};

@@ -158,10 +158,10 @@ CFN_HAL_INLINE void cfn_sal_serialization_populate(cfn_sal_serialization_t      
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SAL_TYPE_SERIALIZATION, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api = api;
-    driver->phy = phy;
-    driver->config = config;
-    driver->cb = callback;
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
 }
 

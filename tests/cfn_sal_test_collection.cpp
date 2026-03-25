@@ -17,10 +17,10 @@ class CollectionTest : public ::testing::Test
     {
         memset(&driver, 0, sizeof(driver));
         memset(&api, 0, sizeof(api));
-        driver.base.type = CFN_SAL_TYPE_COLLECTION;
+        driver.base.type   = CFN_SAL_TYPE_COLLECTION;
         driver.base.status = CFN_HAL_DRIVER_STATUS_CONSTRUCTED;
-        driver.base.vmt = (const struct cfn_hal_api_base_s *) &api;
-        driver.api = &api;
+        driver.base.vmt    = (const struct cfn_hal_api_base_s *) &api;
+        driver.api         = &api;
     }
 };
 
@@ -77,7 +77,7 @@ TEST_F(CollectionTest, PushPopSizeSuccess)
 {
     static int mock_val = 0;
 
-    api.push_back = [](cfn_sal_collection_t *d, const void *item) -> cfn_hal_error_code_t
+    api.push_back       = [](cfn_sal_collection_t *d, const void *item) -> cfn_hal_error_code_t
     {
         (void) d;
         mock_val = *(const int *) item;
@@ -98,9 +98,9 @@ TEST_F(CollectionTest, PushPopSizeSuccess)
         return CFN_HAL_ERROR_OK;
     };
 
-    int    input = 42;
+    int    input  = 42;
     int    output = 0;
-    size_t size = 0;
+    size_t size   = 0;
 
     EXPECT_EQ(cfn_sal_collection_push_back(&driver, &input), CFN_HAL_ERROR_OK);
     EXPECT_EQ(cfn_sal_collection_get_size(&driver, &size), CFN_HAL_ERROR_OK);

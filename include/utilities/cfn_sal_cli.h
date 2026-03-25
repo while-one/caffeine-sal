@@ -22,9 +22,9 @@ extern "C"
 
 typedef enum
 {
-    CFN_SAL_CLI_EVENT_NONE = 0,
+    CFN_SAL_CLI_EVENT_NONE      = 0,
     CFN_SAL_CLI_EVENT_CMD_START = CFN_HAL_BIT(0),
-    CFN_SAL_CLI_EVENT_CMD_DONE = CFN_HAL_BIT(1),
+    CFN_SAL_CLI_EVENT_CMD_DONE  = CFN_HAL_BIT(1),
 } cfn_sal_cli_event_t;
 
 /* Types Structs ----------------------------------------------------*/
@@ -95,10 +95,10 @@ CFN_HAL_INLINE void cfn_sal_cli_populate(cfn_sal_cli_t              *driver,
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SAL_TYPE_CLI, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api = api;
-    driver->phy = phy;
-    driver->config = config;
-    driver->cb = callback;
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
 }
 
@@ -156,7 +156,7 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_sal_cli_callback_register(cfn_sal_cli_t 
     {
         return CFN_HAL_ERROR_BAD_PARAM;
     }
-    driver->cb = callback;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
     return cfn_hal_base_callback_register(&driver->base, CFN_SAL_TYPE_CLI, (cfn_hal_callback_t) callback, user_arg);
 }

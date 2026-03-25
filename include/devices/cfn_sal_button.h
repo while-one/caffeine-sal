@@ -22,10 +22,10 @@ extern "C"
 
 typedef enum
 {
-    CFN_SAL_BUTTON_EVENT_NONE = 0,
-    CFN_SAL_BUTTON_EVENT_PRESSED = CFN_HAL_BIT(0),
-    CFN_SAL_BUTTON_EVENT_RELEASED = CFN_HAL_BIT(1),
-    CFN_SAL_BUTTON_EVENT_LONG_PRESS = CFN_HAL_BIT(2),
+    CFN_SAL_BUTTON_EVENT_NONE         = 0,
+    CFN_SAL_BUTTON_EVENT_PRESSED      = CFN_HAL_BIT(0),
+    CFN_SAL_BUTTON_EVENT_RELEASED     = CFN_HAL_BIT(1),
+    CFN_SAL_BUTTON_EVENT_LONG_PRESS   = CFN_HAL_BIT(2),
     CFN_SAL_BUTTON_EVENT_DOUBLE_CLICK = CFN_HAL_BIT(3),
 } cfn_sal_button_event_t;
 
@@ -92,10 +92,10 @@ CFN_HAL_INLINE void cfn_sal_button_populate(cfn_sal_button_t              *drive
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SAL_TYPE_BUTTON, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api = api;
-    driver->phy = phy;
-    driver->config = config;
-    driver->cb = callback;
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
 }
 
@@ -154,7 +154,7 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_sal_button_callback_register(cfn_sal_but
     {
         return CFN_HAL_ERROR_BAD_PARAM;
     }
-    driver->cb = callback;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
     return cfn_hal_base_callback_register(&driver->base, CFN_SAL_TYPE_BUTTON, (cfn_hal_callback_t) callback, user_arg);
 }

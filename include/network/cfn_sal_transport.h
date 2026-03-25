@@ -22,9 +22,9 @@ extern "C"
 
 typedef enum
 {
-    CFN_SAL_TRANSPORT_EVENT_NONE = 0,
-    CFN_SAL_TRANSPORT_EVENT_TX_COMPLETE = CFN_HAL_BIT(0),
-    CFN_SAL_TRANSPORT_EVENT_RX_READY = CFN_HAL_BIT(1),
+    CFN_SAL_TRANSPORT_EVENT_NONE            = 0,
+    CFN_SAL_TRANSPORT_EVENT_TX_COMPLETE     = CFN_HAL_BIT(0),
+    CFN_SAL_TRANSPORT_EVENT_RX_READY        = CFN_HAL_BIT(1),
     CFN_SAL_TRANSPORT_EVENT_BUFFER_OVERFLOW = CFN_HAL_BIT(2),
 } cfn_sal_transport_event_t;
 
@@ -93,10 +93,10 @@ CFN_HAL_INLINE void cfn_sal_transport_populate(cfn_sal_transport_t              
         return;
     }
     cfn_hal_base_populate(&driver->base, CFN_SAL_TYPE_TRANSPORT, peripheral_id, api ? &api->base : NULL, NULL);
-    driver->api = api;
-    driver->phy = phy;
-    driver->config = config;
-    driver->cb = callback;
+    driver->api         = api;
+    driver->phy         = phy;
+    driver->config      = config;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
 }
 
@@ -156,7 +156,7 @@ CFN_HAL_INLINE cfn_hal_error_code_t cfn_sal_transport_callback_register(cfn_sal_
     {
         return CFN_HAL_ERROR_BAD_PARAM;
     }
-    driver->cb = callback;
+    driver->cb          = callback;
     driver->cb_user_arg = user_arg;
     return cfn_hal_base_callback_register(
         &driver->base, CFN_SAL_TYPE_TRANSPORT, (cfn_hal_callback_t) callback, user_arg);
